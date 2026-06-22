@@ -1,0 +1,146 @@
+product_id,name,brand,category,concern,skin_type,key_ingredients,price_inr,finish,spf,size,source
+P001,Minimalist 10% Niacinamide Face Serum With Matmarine + Zinc,Minimalist,serum,oily skin,oily,"niacinamide, zinc PCA, aloe vera",599.0,liquid,0,30ml,verified
+P002,Minimalist 5% Niacinamide Face Serum With Bifida Ferment,Minimalist,serum,acne,oily,"niacinamide, bifida ferment, oat",599.0,liquid,0,30ml,verified
+P003,Minimalist 2% Salicylic Acid Face Serum,Minimalist,serum,acne,oily,"salicylic acid, zinc, LHA",549.0,liquid,0,30ml,verified
+P004,Minimalist 16% Vitamin C Face Serum With Vitamin E & Ferulic Acid,Minimalist,serum,dullness,all,"vitamin C, vitamin E, ferulic acid",699.0,liquid,0,30ml,verified
+P005,Minimalist 2% Hyaluronic Acid + PGA Face Serum,Minimalist,serum,dryness,dry,"hyaluronic acid, PGA, vitamin B5",599.0,liquid,0,30ml,verified
+P006,Minimalist 2% Alpha Arbutin Face Serum With Butylresorcinol,Minimalist,serum,pigmentation,all,"alpha arbutin, butylresorcinol",699.0,liquid,0,30ml,verified
+P007,Minimalist 8% Glycolic Acid Exfoliating Toner,Minimalist,toner,dullness,all,"glycolic acid, geranium water",549.0,liquid,0,100ml,verified
+P008,Minimalist 2% Salicylic Acid + LHA Face Cleanser With Zinc,Minimalist,cleanser,oily skin,oily,"salicylic acid, LHA, zinc",349.0,gel,0,100ml,verified
+P009,Minimalist SPF 50 PA++++ Sunscreen With Niacinamide,Minimalist,sunscreen,oily skin,oily,"niacinamide, hybrid UV filters",399.0,matte,50,50ml,verified
+P010,Minimalist Vitamin K + Retinal 01% Under Eye Cream With Caffeine,Minimalist,eye care,dark circles,all,"vitamin K, retinal, caffeine",599.0,cream,0,15ml,verified
+P011,Dot & Key Vitamin C + E Super Bright Sunscreen SPF 50+ PA++++,Dot & Key,sunscreen,dullness,all,"vitamin C, vitamin E, UV filters",445.0,dewy,50,50ml,verified
+P012,Dot & Key Watermelon Cooling Sunscreen SPF 50+ PA++++,Dot & Key,sunscreen,sensitivity,sensitive,"watermelon extract, hyaluronic acid",445.0,dewy,50,50ml,verified
+P013,Dot & Key Blueberry Hydrate Barrier Repair Sunscreen SPF 50+,Dot & Key,sunscreen,dryness,dry,"blueberry, ceramides, hyaluronic acid",445.0,dewy,50,50ml,verified
+P014,Dot & Key Vitamin C + E 100% Mineral Sunscreen SPF 50+ PA++++,Dot & Key,sunscreen,sensitivity,sensitive,"zinc oxide, vitamin C, vitamin E",595.0,matte,50,50ml,verified
+P015,Dot & Key Strawberry Dew Tinted Sunscreen SPF 50+,Dot & Key,sunscreen,coverage,all,"strawberry extract, tint, UV filters",549.0,tinted,50,50ml,verified
+P016,Cetaphil Gentle Skin Cleanser,Cetaphil,cleanser,sensitivity,sensitive,"glycerin, panthenol, niacinamide",399.0,cream,0,125ml,verified
+P017,Plum Green Tea Pore Cleansing Gel Face Wash With Glycolic Acid,Plum,cleanser,oily skin,oily,"green tea, glycolic acid",345.0,gel,0,100ml,verified
+P018,Maybelline New York Super Stay Matte Ink Liquid Lipstick - Lover,Maybelline,lip,longwear,all,"dimethicone, pigment",749.0,matte,0,5ml,verified
+P019,Maybelline New York Super Stay Vinyl Ink Liquid Lipstick,Maybelline,lip,longwear,all,"shine polymers, pigment",799.0,glossy,0,4.2ml,verified
+P020,Maybelline New York Fit Me Matte + Poreless 16H Foundation,Maybelline,foundation,oily skin,oily,"perlite, micro-powders",549.0,matte,0,30ml,verified
+P021,Maybelline New York Fit Me Primer Oil-Free,Maybelline,primer,oily skin,oily,"glycerin, blurring polymers",425.0,matte,0,30ml,verified
+P022,Maybelline New York The Colossal Kajal,Maybelline,eye makeup,longwear,sensitive,"carnauba wax, pigment",225.0,matte,0,0.35g,verified
+P023,Maybelline New York Hypercurl Waterproof Mascara,Maybelline,eye makeup,longwear,all,film-forming polymers,299.0,matte,0,9.2ml,verified
+P024,Maybelline New York Lifter Gloss Tinted Lip Gloss,Maybelline,lip,dryness,all,"hyaluronic acid, tint",699.0,glossy,0,5.4ml,verified
+P025,Maybelline New York Instant Age Rewind Concealer,Maybelline,concealer,dark circles,all,"goji berry, haloxyl",699.0,natural,0,6ml,verified
+P026,The Derma Co 10% Vitamin C Face Serum,The Derma Co,serum,dullness,all,"vitamin C, ferulic acid",600.0,liquid,0,30ml,representative
+P027,Dot & Key 10% Vitamin C Face Serum,Dot & Key,serum,dullness,all,"vitamin C, ferulic acid",610.0,liquid,0,30ml,representative
+P028,Plum 1% Hyaluronic + B5 Serum,Plum,serum,dryness,dry,"hyaluronic acid, vitamin B5",500.0,liquid,0,30ml,representative
+P029,Mamaearth 1% Hyaluronic + B5 Serum,Mamaearth,serum,dryness,dry,"hyaluronic acid, vitamin B5",510.0,liquid,0,30ml,representative
+P030,Pilgrim 5% Niacinamide Serum,Pilgrim,serum,oily skin,oily,"niacinamide, zinc",475.0,liquid,0,30ml,representative
+P031,Sugar Pop 5% Niacinamide Serum,Sugar Pop,serum,oily skin,oily,"niacinamide, zinc",485.0,liquid,0,30ml,representative
+P032,Foxtale 2% Salicylic Acid Serum,Foxtale,serum,acne,oily,salicylic acid,525.0,liquid,0,30ml,representative
+P033,RE'EQUIL 2% Salicylic Acid Serum,RE'EQUIL,serum,acne,oily,salicylic acid,535.0,liquid,0,30ml,representative
+P034,Deconstruct Retinol 0.3% Night Serum,Deconstruct,serum,aging,all,"retinol, squalane",750.0,liquid,0,30ml,representative
+P035,Minimalist Retinol 0.3% Night Serum,Minimalist,serum,aging,all,"retinol, squalane",760.0,liquid,0,30ml,representative
+P036,The Derma Co Alpha Arbutin Serum,The Derma Co,serum,pigmentation,all,alpha arbutin,600.0,liquid,0,30ml,representative
+P037,Dot & Key Alpha Arbutin Serum,Dot & Key,serum,pigmentation,all,alpha arbutin,610.0,liquid,0,30ml,representative
+P038,Plum Peptide Firming Serum,Plum,serum,aging,all,"peptides, niacinamide",850.0,liquid,0,30ml,representative
+P039,Mamaearth Peptide Firming Serum,Mamaearth,serum,aging,all,"peptides, niacinamide",860.0,liquid,0,30ml,representative
+P040,Pilgrim Centella Soothing Serum,Pilgrim,serum,sensitivity,sensitive,"centella, panthenol",550.0,liquid,0,30ml,representative
+P041,Sugar Pop Centella Soothing Serum,Sugar Pop,serum,sensitivity,sensitive,"centella, panthenol",560.0,liquid,0,30ml,representative
+P042,Cetaphil Gentle Foaming Face Wash,Cetaphil,cleanser,sensitivity,sensitive,"glycerin, panthenol",350.0,foam,0,100ml,representative
+P043,Plum Gentle Foaming Face Wash,Plum,cleanser,sensitivity,sensitive,"glycerin, panthenol",360.0,foam,0,150ml,representative
+P044,Mamaearth Salicylic Acid Face Wash,Mamaearth,cleanser,oily skin,oily,"salicylic acid, tea tree",325.0,gel,0,150ml,representative
+P045,The Derma Co Salicylic Acid Face Wash,The Derma Co,cleanser,oily skin,oily,"salicylic acid, tea tree",335.0,gel,0,100ml,representative
+P046,Simple Vitamin C Brightening Face Wash,Simple,cleanser,dullness,all,vitamin C,325.0,gel,0,100ml,representative
+P047,Sebamed Vitamin C Brightening Face Wash,Sebamed,cleanser,dullness,all,vitamin C,335.0,gel,0,150ml,representative
+P048,Foxtale Ubtan Glow Face Wash,Foxtale,cleanser,dullness,all,"turmeric, saffron",275.0,cream,0,150ml,representative
+P049,Minimalist Ubtan Glow Face Wash,Minimalist,cleanser,dullness,all,"turmeric, saffron",285.0,cream,0,100ml,representative
+P050,Cetaphil Hydrating Cream Cleanser,Cetaphil,cleanser,dryness,dry,"glycerin, ceramides",400.0,cream,0,100ml,representative
+P051,Plum Hydrating Cream Cleanser,Plum,cleanser,dryness,dry,"glycerin, ceramides",410.0,cream,0,150ml,representative
+P052,Mamaearth Charcoal Detox Face Wash,Mamaearth,cleanser,oily skin,oily,activated charcoal,325.0,foam,0,150ml,representative
+P053,The Derma Co Charcoal Detox Face Wash,The Derma Co,cleanser,oily skin,oily,activated charcoal,335.0,foam,0,100ml,representative
+P054,Cetaphil Oil-Free Gel Moisturizer,Cetaphil,moisturizer,oily skin,oily,"niacinamide, glycerin",425.0,gel,0,50ml,representative
+P055,Neutrogena Oil-Free Gel Moisturizer,Neutrogena,moisturizer,oily skin,oily,"niacinamide, glycerin",435.0,gel,0,80ml,representative
+P056,Dot & Key Ceramide Barrier Cream,Dot & Key,moisturizer,dryness,dry,"ceramides, shea butter",545.0,cream,0,80ml,representative
+P057,Plum Ceramide Barrier Cream,Plum,moisturizer,dryness,dry,"ceramides, shea butter",555.0,cream,0,50ml,representative
+P058,Mamaearth Aloe Soothing Gel,Mamaearth,moisturizer,sensitivity,sensitive,"aloe vera, chamomile",300.0,gel,0,50ml,representative
+P059,Re'equil Aloe Soothing Gel,Re'equil,moisturizer,sensitivity,sensitive,"aloe vera, chamomile",310.0,gel,0,80ml,representative
+P060,Minimalist Vitamin C Day Cream,Minimalist,moisturizer,dullness,all,"vitamin C, SPF",500.0,cream,0,80ml,representative
+P061,Pond's Vitamin C Day Cream,Pond's,moisturizer,dullness,all,"vitamin C, SPF",510.0,cream,0,50ml,representative
+P062,Cetaphil Hyaluronic Water Cream,Cetaphil,moisturizer,dryness,all,hyaluronic acid,470.0,gel,0,50ml,representative
+P063,Neutrogena Hyaluronic Water Cream,Neutrogena,moisturizer,dryness,all,hyaluronic acid,480.0,gel,0,80ml,representative
+P064,Dot & Key Night Repair Cream,Dot & Key,moisturizer,aging,all,"retinol, peptides",700.0,cream,0,80ml,representative
+P065,Plum Night Repair Cream,Plum,moisturizer,aging,all,"retinol, peptides",710.0,cream,0,50ml,representative
+P066,Dot & Key Ultra Light Gel Sunscreen SPF 50,Dot & Key,sunscreen,oily skin,oily,hybrid UV filters,470.0,matte,50,50ml,representative
+P067,Minimalist Ultra Light Gel Sunscreen SPF 50,Minimalist,sunscreen,oily skin,oily,hybrid UV filters,480.0,matte,50,50ml,representative
+P068,The Derma Co Hydrating Sunscreen SPF 50 PA++++,The Derma Co,sunscreen,dryness,dry,"hyaluronic acid, UV filters",495.0,dewy,50,50ml,representative
+P069,Re'equil Hydrating Sunscreen SPF 50 PA++++,Re'equil,sunscreen,dryness,dry,"hyaluronic acid, UV filters",505.0,dewy,50,50ml,representative
+P070,Aqualogica Mineral Sunscreen SPF 30,Aqualogica,sunscreen,sensitivity,sensitive,"zinc oxide, titanium dioxide",550.0,matte,50,50ml,representative
+P071,Foxtale Mineral Sunscreen SPF 30,Foxtale,sunscreen,sensitivity,sensitive,"zinc oxide, titanium dioxide",560.0,matte,50,50ml,representative
+P072,La Shield Tinted Sunscreen SPF 50,La Shield,sunscreen,coverage,all,"tint, UV filters",550.0,tinted,50,50ml,representative
+P073,Lakme Tinted Sunscreen SPF 50,Lakme,sunscreen,coverage,all,"tint, UV filters",560.0,tinted,50,50ml,representative
+P074,Dot & Key Vitamin C Glow Sunscreen SPF 50,Dot & Key,sunscreen,dullness,all,"vitamin C, UV filters",495.0,dewy,50,50ml,representative
+P075,Minimalist Vitamin C Glow Sunscreen SPF 50,Minimalist,sunscreen,dullness,all,"vitamin C, UV filters",505.0,dewy,50,50ml,representative
+P076,Minimalist Rose Hydrating Toner,Minimalist,toner,dryness,dry,"rose water, glycerin",370.0,liquid,0,100ml,representative
+P077,Plum Rose Hydrating Toner,Plum,toner,dryness,dry,"rose water, glycerin",380.0,liquid,0,150ml,representative
+P078,Dot & Key Salicylic Acid Pore Toner,Dot & Key,toner,oily skin,oily,"salicylic acid, witch hazel",470.0,liquid,0,150ml,representative
+P079,The Derma Co Salicylic Acid Pore Toner,The Derma Co,toner,oily skin,oily,"salicylic acid, witch hazel",480.0,liquid,0,100ml,representative
+P080,Pilgrim Glycolic Acid Exfoliating Toner,Pilgrim,toner,dullness,all,glycolic acid,525.0,liquid,0,100ml,representative
+P081,Minimalist Glycolic Acid Exfoliating Toner,Minimalist,toner,dullness,all,glycolic acid,535.0,liquid,0,150ml,representative
+P082,Plum Green Tea Clarifying Toner,Plum,toner,oily skin,oily,"green tea, niacinamide",370.0,liquid,0,150ml,representative
+P083,Dot & Key Green Tea Clarifying Toner,Dot & Key,toner,oily skin,oily,"green tea, niacinamide",380.0,liquid,0,100ml,representative
+P084,Plum Clay Detox Face Mask,Plum,mask,oily skin,oily,"kaolin clay, charcoal",400.0,clay,0,50g,representative
+P085,Mamaearth Clay Detox Face Mask,Mamaearth,mask,oily skin,oily,"kaolin clay, charcoal",410.0,clay,0,100g,representative
+P086,The Face Shop Overnight Sleeping Mask,The Face Shop,mask,dryness,dry,"hyaluronic acid, niacinamide",520.0,gel,0,100g,representative
+P087,Garnier Overnight Sleeping Mask,Garnier,mask,dryness,dry,"hyaluronic acid, niacinamide",530.0,gel,0,25g,representative
+P088,Innisfree Brightening Sheet Mask,Innisfree,mask,dullness,all,vitamin C,100.0,sheet,0,25g,representative
+P089,Sugar Pop Brightening Sheet Mask,Sugar Pop,mask,dullness,all,vitamin C,110.0,sheet,0,50g,representative
+P090,Plum Soothing Aloe Mask,Plum,mask,sensitivity,sensitive,"aloe, centella",300.0,gel,0,50g,representative
+P091,Mamaearth Soothing Aloe Mask,Mamaearth,mask,sensitivity,sensitive,"aloe, centella",310.0,gel,0,100g,representative
+P092,Sugar Matte Liquid Lipstick - Brick Red,Sugar,lip,longwear,all,"vitamin E, pigment",500.0,matte,0,4g,representative
+P093,Maybelline Matte Liquid Lipstick - Mauve Nude,Maybelline,lip,longwear,all,"vitamin E, pigment",510.0,matte,0,5ml,representative
+P094,Lakme Matte Liquid Lipstick - Coral Crush,Lakme,lip,longwear,all,"vitamin E, pigment",520.0,matte,0,7ml,representative
+P095,Nykaa Cosmetics Matte Liquid Lipstick - Berry Bold,Nykaa Cosmetics,lip,longwear,all,"vitamin E, pigment",530.0,matte,0,4g,representative
+P096,Sugar Pop Creamy Bullet Lipstick - Brick Red,Sugar Pop,lip,longwear,all,"shea butter, pigment",450.0,cream,0,5ml,representative
+P097,MyGlamm Creamy Bullet Lipstick - Mauve Nude,MyGlamm,lip,longwear,all,"shea butter, pigment",460.0,cream,0,7ml,representative
+P098,Faces Canada Creamy Bullet Lipstick - Coral Crush,Faces Canada,lip,longwear,all,"shea butter, pigment",470.0,cream,0,4g,representative
+P099,Sugar Creamy Bullet Lipstick - Berry Bold,Sugar,lip,longwear,all,"shea butter, pigment",480.0,cream,0,5ml,representative
+P100,Maybelline Tinted Lip Balm - Brick Red,Maybelline,lip,dryness,all,"shea butter, vitamin E",300.0,sheer,0,7ml,representative
+P101,Lakme Tinted Lip Balm - Mauve Nude,Lakme,lip,dryness,all,"shea butter, vitamin E",310.0,sheer,0,4g,representative
+P102,Nykaa Cosmetics Tinted Lip Balm - Coral Crush,Nykaa Cosmetics,lip,dryness,all,"shea butter, vitamin E",320.0,sheer,0,5ml,representative
+P103,Sugar Pop Tinted Lip Balm - Berry Bold,Sugar Pop,lip,dryness,all,"shea butter, vitamin E",330.0,sheer,0,7ml,representative
+P104,MyGlamm Glossy Lip Oil - Brick Red,MyGlamm,lip,dryness,all,"jojoba oil, vitamin E",400.0,glossy,0,4g,representative
+P105,Faces Canada Glossy Lip Oil - Mauve Nude,Faces Canada,lip,dryness,all,"jojoba oil, vitamin E",410.0,glossy,0,5ml,representative
+P106,Sugar Glossy Lip Oil - Coral Crush,Sugar,lip,dryness,all,"jojoba oil, vitamin E",420.0,glossy,0,7ml,representative
+P107,Maybelline Glossy Lip Oil - Berry Bold,Maybelline,lip,dryness,all,"jojoba oil, vitamin E",430.0,glossy,0,4g,representative
+P108,Lakme Matte Liquid Foundation - Fair,Lakme,foundation,oily skin,oily,"perlite, silica",675.0,matte,15,30ml,representative
+P109,Maybelline Matte Liquid Foundation - Light,Maybelline,foundation,oily skin,oily,"perlite, silica",685.0,matte,15,30ml,representative
+P110,L'Oreal Paris Matte Liquid Foundation - Natural,L'Oreal Paris,foundation,oily skin,oily,"perlite, silica",695.0,matte,15,30ml,representative
+P111,Nykaa Cosmetics Matte Liquid Foundation - Wheatish,Nykaa Cosmetics,foundation,oily skin,oily,"perlite, silica",705.0,matte,15,30ml,representative
+P112,Faces Canada Hydrating Serum Foundation - Fair,Faces Canada,foundation,dryness,dry,hyaluronic acid,775.0,dewy,15,30ml,representative
+P113,SUGAR Hydrating Serum Foundation - Light,SUGAR,foundation,dryness,dry,hyaluronic acid,785.0,dewy,15,30ml,representative
+P114,Lakme Hydrating Serum Foundation - Natural,Lakme,foundation,dryness,dry,hyaluronic acid,795.0,dewy,15,30ml,representative
+P115,Maybelline Hydrating Serum Foundation - Wheatish,Maybelline,foundation,dryness,dry,hyaluronic acid,805.0,dewy,15,30ml,representative
+P116,L'Oreal Paris Buildable Natural Foundation - Fair,L'Oreal Paris,foundation,coverage,all,"glycerin, vitamin E",700.0,natural,15,30ml,representative
+P117,Nykaa Cosmetics Buildable Natural Foundation - Light,Nykaa Cosmetics,foundation,coverage,all,"glycerin, vitamin E",710.0,natural,15,30ml,representative
+P118,Faces Canada Buildable Natural Foundation - Natural,Faces Canada,foundation,coverage,all,"glycerin, vitamin E",720.0,natural,15,30ml,representative
+P119,SUGAR Buildable Natural Foundation - Wheatish,SUGAR,foundation,coverage,all,"glycerin, vitamin E",730.0,natural,15,30ml,representative
+P120,Maybelline Intense Kajal,Maybelline,eye makeup,longwear,sensitive,carnauba wax,250.0,matte,0,1.2g,representative
+P121,Lakme Intense Kajal,Lakme,eye makeup,longwear,sensitive,carnauba wax,260.0,matte,0,9ml,representative
+P122,Sugar Volumizing Mascara,Sugar,eye makeup,longwear,all,film polymers,450.0,matte,0,9ml,representative
+P123,Nykaa Cosmetics Volumizing Mascara,Nykaa Cosmetics,eye makeup,longwear,all,film polymers,460.0,matte,0,2.5ml,representative
+P124,Faces Canada Liquid Eyeliner,Faces Canada,eye makeup,longwear,all,"pigment, polymers",325.0,matte,0,2.5ml,representative
+P125,MyGlamm Liquid Eyeliner,MyGlamm,eye makeup,longwear,all,"pigment, polymers",335.0,matte,0,10g,representative
+P126,Maybelline Eyeshadow Palette,Maybelline,eye makeup,coverage,all,"mica, pigment",900.0,shimmer,0,10g,representative
+P127,Lakme Eyeshadow Palette,Lakme,eye makeup,coverage,all,"mica, pigment",910.0,shimmer,0,1.2g,representative
+P128,Mamaearth Onion Hair Growth Shampoo,Mamaearth,haircare,hair fall,all,"onion oil, biotin",400.0,liquid,0,100ml,representative
+P129,WOW Skin Science Onion Hair Growth Shampoo,WOW Skin Science,haircare,hair fall,all,"onion oil, biotin",410.0,liquid,0,200ml,representative
+P130,Pilgrim Rosemary Scalp Serum,Pilgrim,haircare,hair fall,all,"rosemary, redensyl",550.0,liquid,0,200ml,representative
+P131,The Tribe Concepts Rosemary Scalp Serum,The Tribe Concepts,haircare,hair fall,all,"rosemary, redensyl",560.0,liquid,0,250ml,representative
+P132,L'Oreal Paris Anti-Dandruff Shampoo,L'Oreal Paris,haircare,dandruff,all,"ketoconazole, tea tree",425.0,liquid,0,250ml,representative
+P133,Tresemme Anti-Dandruff Shampoo,Tresemme,haircare,dandruff,all,"ketoconazole, tea tree",435.0,liquid,0,100ml,representative
+P134,Mamaearth Hair Repair Conditioner,Mamaearth,haircare,dryness,dry,"argan oil, keratin",425.0,cream,0,100ml,representative
+P135,WOW Skin Science Hair Repair Conditioner,WOW Skin Science,haircare,dryness,dry,"argan oil, keratin",435.0,cream,0,200ml,representative
+P136,Pilgrim Hair Growth Oil,Pilgrim,haircare,hair fall,all,"bhringraj, amla",350.0,oil,0,200ml,representative
+P137,The Tribe Concepts Hair Growth Oil,The Tribe Concepts,haircare,hair fall,all,"bhringraj, amla",360.0,oil,0,250ml,representative
+P138,Plum Body Lotion Deep Moisture,Plum,body care,dryness,dry,"shea butter, glycerin",350.0,cream,0,200ml,representative
+P139,Mamaearth Body Lotion Deep Moisture,Mamaearth,body care,dryness,dry,"shea butter, glycerin",360.0,cream,0,300ml,representative
+P140,Nivea Vitamin C Body Wash,Nivea,body care,dullness,all,vitamin C,300.0,gel,0,300ml,representative
+P141,The Body Shop Vitamin C Body Wash,The Body Shop,body care,dullness,all,vitamin C,310.0,gel,0,100g,representative
+P142,Dove Coffee Body Scrub,Dove,body care,dullness,all,"coffee, walnut",425.0,scrub,0,100g,representative
+P143,Cetaphil Coffee Body Scrub,Cetaphil,body care,dullness,all,"coffee, walnut",435.0,scrub,0,200ml,representative
+P144,Plum Soothing Body Butter,Plum,body care,dryness,sensitive,"cocoa butter, aloe",595.0,cream,0,200ml,representative
+P145,Mamaearth Soothing Body Butter,Mamaearth,body care,dryness,sensitive,"cocoa butter, aloe",605.0,cream,0,300ml,representative

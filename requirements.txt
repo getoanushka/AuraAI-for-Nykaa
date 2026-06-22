@@ -1,0 +1,10 @@
+# Core
+google-genai>=1.0.0
+
+# UI
+streamlit>=1.30.0
+
+# Optional — enables the semantic/vector RAG backend (app/retrieval.py).
+# Without these the project runs on the dependency-free lexical fallback.
+chromadb>=0.5.0
+sentence-transformers>=3.0.0

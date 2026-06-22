@@ -1,0 +1,635 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aura — Nykaa Beauty Advisor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@900&display=swap');
+  :root{
+    --ink:#1a1320; --muted:#7a6b78; --line:#ece4ea; --bg:#fbf7fa;
+    --pink:#e0218a; --pink-deep:#b3006e; --gold:#c9a14a; --card:#ffffff;
+    --ok:#1f9d6b; --shadow:0 12px 40px rgba(96,12,64,.14);
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.5}
+  a{color:inherit}
+  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;padding:14px 22px}
+  .logo{font-weight:800;letter-spacing:.04em;font-size:22px;color:var(--pink)}
+  .logo span{color:var(--ink);font-weight:400;font-size:13px;letter-spacing:.18em;
+    display:block;margin-top:-2px;text-transform:uppercase}
+  .cart-pill{display:flex;align-items:center;gap:8px;background:var(--bg);
+    border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px}
+  .cart-pill b{color:var(--pink-deep)}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 22px 120px}
+  .hero{padding:8px 2px 22px}
+  .hero h1{font-size:26px;margin:0 0 6px;font-weight:800}
+  .hero p{margin:0;color:var(--muted);max-width:60ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:14px;display:flex;flex-direction:column;gap:8px;transition:transform .12s,box-shadow .12s}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .swatch{height:96px;border-radius:10px;display:flex;align-items:flex-end;padding:8px;
+    color:#fff;font-size:11px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .brand{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .pname{font-size:13.5px;font-weight:600;min-height:38px}
+  .price{font-weight:800;font-size:16px}
+  .add{margin-top:auto;border:1px solid var(--pink);background:#fff;color:var(--pink-deep);
+    border-radius:999px;padding:8px;font-weight:700;cursor:pointer;font-size:13px}
+  .add:hover{background:var(--pink);color:#fff}
+
+  /* cart drawer */
+  .drawer{position:fixed;top:0;right:0;height:100%;width:360px;max-width:90vw;background:#fff;
+    box-shadow:var(--shadow);transform:translateX(100%);transition:transform .25s;z-index:40;
+    display:flex;flex-direction:column}
+  .drawer.open{transform:none}
+  .drawer h3{margin:0;padding:18px 18px 12px;border-bottom:1px solid var(--line);font-size:17px;
+    display:flex;align-items:center;justify-content:space-between}
+  .drawer-close{width:28px;height:28px;border:1px solid var(--line);border-radius:50%;background:#fff;
+    color:var(--muted);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .drawer-close:hover{border-color:var(--pink);color:var(--pink-deep)}
+  .ci{display:flex;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)}
+  .ci .meta{flex:1}
+  .ci .meta .n{font-size:13px;font-weight:600}
+  .ci .meta .b{font-size:11px;color:var(--muted)}
+  .qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .qty button{width:24px;height:24px;border:1px solid var(--line);background:#fff;border-radius:6px;
+    cursor:pointer;font-weight:700}
+  .rm{color:var(--muted);font-size:11px;background:none;border:none;cursor:pointer;text-decoration:underline}
+  .cart-foot{margin-top:auto;padding:16px 18px;border-top:1px solid var(--line)}
+  .cart-foot .row{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px}
+  .cart-foot .row.total{font-size:18px;font-weight:800}
+  .checkout{width:100%;background:var(--pink);color:#fff;border:none;border-radius:999px;
+    padding:13px;font-weight:800;cursor:pointer;font-size:15px}
+  .checkout:hover{background:var(--pink-deep)}
+  .empty{padding:30px 18px;color:var(--muted);font-size:14px}
+
+  /* floating agent */
+  .fab{position:fixed;right:22px;bottom:22px;z-index:50;width:74px;height:74px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.7);cursor:pointer;color:#fff;
+    font-family:'Libre Franklin','Arial Black',Impact,sans-serif;font-weight:900;font-size:12px;
+    text-transform:uppercase;letter-spacing:-.02em;line-height:1;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    overflow:hidden;isolation:isolate;
+    box-shadow:0 10px 28px rgba(224,33,138,.4);transition:transform .14s, box-shadow .2s}
+  /* slowly rotating pink swirl with just a soft blush highlight (no harsh white) */
+  .fab::before{content:"";position:absolute;inset:-60%;z-index:0;
+    background:conic-gradient(from 0deg,#c81e7e,#e0218a,#ff5fa8,#f72585,#ff9ecb,#ffd0e6 50%,#ff79b8 56%,#c81e7e);
+    animation:nebulaSpin 16s linear infinite}
+  /* faint glassy sheen so it reads as a glossy orb (kept subtle to avoid harsh white) */
+  .fab::after{content:"";position:absolute;inset:0;z-index:1;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%, rgba(255,255,255,.16), transparent 38%)}
+  .fab span{position:relative;z-index:2;text-shadow:0 1px 5px rgba(157,12,64,.6)}
+  .fab:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 16px 40px rgba(224,33,138,.55)}
+  @keyframes nebulaSpin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){ .fab::before{animation:none} }
+  .panel{position:fixed;right:22px;bottom:94px;z-index:50;width:360px;max-width:92vw;height:520px;max-height:78vh;
+    background:#fff;border-radius:18px;box-shadow:var(--shadow);display:none;flex-direction:column;overflow:hidden}
+  .panel.open{display:flex}
+  .ph{background:linear-gradient(135deg,var(--pink),var(--pink-deep));color:#fff;padding:14px 16px;position:relative}
+  .ph-close{position:absolute;top:10px;right:10px;width:28px;height:28px;border:none;border-radius:50%;
+    background:rgba(255,255,255,.18);color:#fff;font-size:15px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+  .ph-close:hover{background:rgba(255,255,255,.34)}
+  .ph .t{font-weight:800;font-size:15px}
+  .ph .s{font-size:11.5px;opacity:.85}
+  .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+  .m{max-width:84%;padding:9px 12px;border-radius:14px;font-size:13.5px;white-space:pre-wrap}
+  .m.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+  .m.user{background:var(--pink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+  .m.sys{align-self:center;background:none;color:var(--muted);font-size:11px;padding:2px 6px;max-width:100%}
+  .m.act{align-self:flex-start;background:#fff5fb;border:1px dashed var(--pink);color:var(--pink-deep);
+    font-size:12px;font-weight:600}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px;background:var(--bg)}
+  .chip{font-size:11.5px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;cursor:pointer}
+  .chip:hover{border-color:var(--pink);color:var(--pink-deep)}
+  .pin{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:#fff}
+  .pin input{flex:1;border:1px solid var(--line);border-radius:999px;padding:10px 14px;font-size:13.5px;outline:none}
+  .pin input:focus{border-color:var(--pink)}
+  .pin button{background:var(--pink);color:#fff;border:none;border-radius:999px;padding:0 16px;font-weight:700;cursor:pointer}
+
+  /* checkout modal */
+  .modal{position:fixed;inset:0;z-index:60;background:rgba(40,8,28,.5);display:none;
+    align-items:center;justify-content:center;padding:18px}
+  .modal.open{display:flex}
+  .sheet{background:#fff;border-radius:18px;max-width:380px;width:100%;padding:24px;text-align:center}
+  .sheet .tick{width:56px;height:56px;border-radius:50%;background:var(--ok);color:#fff;font-size:30px;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+  .sheet h2{margin:0 0 6px}
+  .sheet p{color:var(--muted);font-size:14px;margin:0 0 16px}
+  .sheet .lines{text-align:left;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:16px;font-size:13px}
+  .sheet .lines .l{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0}
+  .sheet .lines .l.tot{font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+  .sheet .lines a.buy{color:var(--pink-deep);font-size:11px;font-weight:700;white-space:nowrap}
+  .sheet button{background:var(--pink);color:#fff;border:none;border-radius:999px;padding:12px 22px;font-weight:800;cursor:pointer;width:100%}
+  .sheet button.ghost{background:#fff;color:var(--muted);border:1px solid var(--line);margin-top:10px;font-weight:600}
+  .demo-tag{position:fixed;left:12px;bottom:12px;z-index:55;background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;font-size:11px;color:var(--muted);box-shadow:var(--shadow)}
+
+  /* product image tiles (self-contained, no external assets) */
+  .prodimg{height:96px;border-radius:10px;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center}
+  .prodimg .emoji{font-size:38px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.3))}
+  .prodimg .tag{position:absolute;left:8px;bottom:7px;color:#fff;font-size:10.5px;font-weight:600;
+    text-transform:capitalize;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+
+  /* toast confirmation */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:13px;font-weight:600;
+    box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:70}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+
+<header>
+  <div class="logo">Aura<span>nykaa beauty advisor</span></div>
+  <div class="cart-pill" onclick="toggleCart(true)">🛍️ Bag <b id="cartCount">0</b></div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Shop with your Beauty Advisor</h1>
+    <p>Browse below, or tap the pink advisor button (bottom-right) and just say what you want —
+       “sunscreen for oily skin under 500”, “add a niacinamide serum”, “build a daytime routine”.
+       It fills your bag and walks you to checkout.</p>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- Cart drawer -->
+<div class="drawer" id="drawer">
+  <h3><span>Your Bag</span><button class="drawer-close" onclick="toggleCart(false)" aria-label="Close bag" title="Close">✕</button></h3>
+  <div id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="row"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+    <div class="row total"><span>Total</span><span id="total">₹0</span></div>
+    <button class="checkout" onclick="checkout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- Floating agent -->
+<button class="fab" id="fab" aria-label="Chat with Nebula — drag to move"><span>Nebula</span></button>
+<div class="panel" id="panel">
+  <div class="ph">
+    <div class="t">Nebula</div>
+    <div class="s">your Nykaa beauty bestie</div>
+    <button class="ph-close" onclick="togglePanel(false)" aria-label="Close advisor" title="Close">✕</button>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="chips" id="chips"></div>
+  <div class="pin">
+    <input id="input" placeholder="e.g. daytime routine for oily skin under 1500" autocomplete="off">
+    <button onclick="send()">↑</button>
+  </div>
+</div>
+
+<!-- Checkout modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h2>Your Bag</h2>
+    <p>Payment can't be taken in this demo — tap any item (or the button below) to buy it
+       on Nykaa.com, where you can check out for real. Your bag stays saved here.</p>
+    <div class="lines" id="orderLines"></div>
+    <button onclick="openOnNykaa()">Open my bag on Nykaa.com</button>
+    <button class="ghost" onclick="closeCheckout()">Keep shopping</button>
+  </div>
+</div>
+
+<div class="demo-tag">Aura · AI advisor + bag · checkout opens Nykaa.com</div>
+
+<script>
+// ---- Real Nykaa catalog (public product data) ----
+const CATALOG = [{"product_id": "P001", "name": "Minimalist 10% Niacinamide Face Serum With Matmarine + Zinc", "brand": "Minimalist", "category": "serum", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "niacinamide, zinc PCA, aloe vera", "price_inr": 599.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P002", "name": "Minimalist 5% Niacinamide Face Serum With Bifida Ferment", "brand": "Minimalist", "category": "serum", "concern": "acne", "skin_type": "oily", "key_ingredients": "niacinamide, bifida ferment, oat", "price_inr": 599.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P003", "name": "Minimalist 2% Salicylic Acid Face Serum", "brand": "Minimalist", "category": "serum", "concern": "acne", "skin_type": "oily", "key_ingredients": "salicylic acid, zinc, LHA", "price_inr": 549.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P004", "name": "Minimalist 16% Vitamin C Face Serum With Vitamin E & Ferulic Acid", "brand": "Minimalist", "category": "serum", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, vitamin E, ferulic acid", "price_inr": 699.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P005", "name": "Minimalist 2% Hyaluronic Acid + PGA Face Serum", "brand": "Minimalist", "category": "serum", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, PGA, vitamin B5", "price_inr": 599.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P006", "name": "Minimalist 2% Alpha Arbutin Face Serum With Butylresorcinol", "brand": "Minimalist", "category": "serum", "concern": "pigmentation", "skin_type": "all", "key_ingredients": "alpha arbutin, butylresorcinol", "price_inr": 699.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P007", "name": "Minimalist 8% Glycolic Acid Exfoliating Toner", "brand": "Minimalist", "category": "toner", "concern": "dullness", "skin_type": "all", "key_ingredients": "glycolic acid, geranium water", "price_inr": 549.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "verified"}, {"product_id": "P008", "name": "Minimalist 2% Salicylic Acid + LHA Face Cleanser With Zinc", "brand": "Minimalist", "category": "cleanser", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "salicylic acid, LHA, zinc", "price_inr": 349.0, "finish": "gel", "spf": 0, "size": "100ml", "source": "verified"}, {"product_id": "P009", "name": "Minimalist SPF 50 PA++++ Sunscreen With Niacinamide", "brand": "Minimalist", "category": "sunscreen", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "niacinamide, hybrid UV filters", "price_inr": 399.0, "finish": "matte", "spf": 50, "size": "50ml", "source": "verified"}, {"product_id": "P010", "name": "Minimalist Vitamin K + Retinal 01% Under Eye Cream With Caffeine", "brand": "Minimalist", "category": "eye care", "concern": "dark circles", "skin_type": "all", "key_ingredients": "vitamin K, retinal, caffeine", "price_inr": 599.0, "finish": "cream", "spf": 0, "size": "15ml", "source": "verified"}, {"product_id": "P011", "name": "Dot & Key Vitamin C + E Super Bright Sunscreen SPF 50+ PA++++", "brand": "Dot & Key", "category": "sunscreen", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, vitamin E, UV filters", "price_inr": 445.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "verified"}, {"product_id": "P012", "name": "Dot & Key Watermelon Cooling Sunscreen SPF 50+ PA++++", "brand": "Dot & Key", "category": "sunscreen", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "watermelon extract, hyaluronic acid", "price_inr": 445.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "verified"}, {"product_id": "P013", "name": "Dot & Key Blueberry Hydrate Barrier Repair Sunscreen SPF 50+", "brand": "Dot & Key", "category": "sunscreen", "concern": "dryness", "skin_type": "dry", "key_ingredients": "blueberry, ceramides, hyaluronic acid", "price_inr": 445.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "verified"}, {"product_id": "P014", "name": "Dot & Key Vitamin C + E 100% Mineral Sunscreen SPF 50+ PA++++", "brand": "Dot & Key", "category": "sunscreen", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "zinc oxide, vitamin C, vitamin E", "price_inr": 595.0, "finish": "matte", "spf": 50, "size": "50ml", "source": "verified"}, {"product_id": "P015", "name": "Dot & Key Strawberry Dew Tinted Sunscreen SPF 50+", "brand": "Dot & Key", "category": "sunscreen", "concern": "coverage", "skin_type": "all", "key_ingredients": "strawberry extract, tint, UV filters", "price_inr": 549.0, "finish": "tinted", "spf": 50, "size": "50ml", "source": "verified"}, {"product_id": "P016", "name": "Cetaphil Gentle Skin Cleanser", "brand": "Cetaphil", "category": "cleanser", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "glycerin, panthenol, niacinamide", "price_inr": 399.0, "finish": "cream", "spf": 0, "size": "125ml", "source": "verified"}, {"product_id": "P017", "name": "Plum Green Tea Pore Cleansing Gel Face Wash With Glycolic Acid", "brand": "Plum", "category": "cleanser", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "green tea, glycolic acid", "price_inr": 345.0, "finish": "gel", "spf": 0, "size": "100ml", "source": "verified"}, {"product_id": "P018", "name": "Maybelline New York Super Stay Matte Ink Liquid Lipstick - Lover", "brand": "Maybelline", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "dimethicone, pigment", "price_inr": 749.0, "finish": "matte", "spf": 0, "size": "5ml", "source": "verified"}, {"product_id": "P019", "name": "Maybelline New York Super Stay Vinyl Ink Liquid Lipstick", "brand": "Maybelline", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "shine polymers, pigment", "price_inr": 799.0, "finish": "glossy", "spf": 0, "size": "4.2ml", "source": "verified"}, {"product_id": "P020", "name": "Maybelline New York Fit Me Matte + Poreless 16H Foundation", "brand": "Maybelline", "category": "foundation", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "perlite, micro-powders", "price_inr": 549.0, "finish": "matte", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P021", "name": "Maybelline New York Fit Me Primer Oil-Free", "brand": "Maybelline", "category": "primer", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "glycerin, blurring polymers", "price_inr": 425.0, "finish": "matte", "spf": 0, "size": "30ml", "source": "verified"}, {"product_id": "P022", "name": "Maybelline New York The Colossal Kajal", "brand": "Maybelline", "category": "eye makeup", "concern": "longwear", "skin_type": "sensitive", "key_ingredients": "carnauba wax, pigment", "price_inr": 225.0, "finish": "matte", "spf": 0, "size": "0.35g", "source": "verified"}, {"product_id": "P023", "name": "Maybelline New York Hypercurl Waterproof Mascara", "brand": "Maybelline", "category": "eye makeup", "concern": "longwear", "skin_type": "all", "key_ingredients": "film-forming polymers", "price_inr": 299.0, "finish": "matte", "spf": 0, "size": "9.2ml", "source": "verified"}, {"product_id": "P024", "name": "Maybelline New York Lifter Gloss Tinted Lip Gloss", "brand": "Maybelline", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "hyaluronic acid, tint", "price_inr": 699.0, "finish": "glossy", "spf": 0, "size": "5.4ml", "source": "verified"}, {"product_id": "P025", "name": "Maybelline New York Instant Age Rewind Concealer", "brand": "Maybelline", "category": "concealer", "concern": "dark circles", "skin_type": "all", "key_ingredients": "goji berry, haloxyl", "price_inr": 699.0, "finish": "natural", "spf": 0, "size": "6ml", "source": "verified"}, {"product_id": "P026", "name": "The Derma Co 10% Vitamin C Face Serum", "brand": "The Derma Co", "category": "serum", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, ferulic acid", "price_inr": 600.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P027", "name": "Dot & Key 10% Vitamin C Face Serum", "brand": "Dot & Key", "category": "serum", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, ferulic acid", "price_inr": 610.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P028", "name": "Plum 1% Hyaluronic + B5 Serum", "brand": "Plum", "category": "serum", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, vitamin B5", "price_inr": 500.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P029", "name": "Mamaearth 1% Hyaluronic + B5 Serum", "brand": "Mamaearth", "category": "serum", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, vitamin B5", "price_inr": 510.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P030", "name": "Pilgrim 5% Niacinamide Serum", "brand": "Pilgrim", "category": "serum", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "niacinamide, zinc", "price_inr": 475.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P031", "name": "Sugar Pop 5% Niacinamide Serum", "brand": "Sugar Pop", "category": "serum", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "niacinamide, zinc", "price_inr": 485.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P032", "name": "Foxtale 2% Salicylic Acid Serum", "brand": "Foxtale", "category": "serum", "concern": "acne", "skin_type": "oily", "key_ingredients": "salicylic acid", "price_inr": 525.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P033", "name": "RE'EQUIL 2% Salicylic Acid Serum", "brand": "RE'EQUIL", "category": "serum", "concern": "acne", "skin_type": "oily", "key_ingredients": "salicylic acid", "price_inr": 535.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P034", "name": "Deconstruct Retinol 0.3% Night Serum", "brand": "Deconstruct", "category": "serum", "concern": "aging", "skin_type": "all", "key_ingredients": "retinol, squalane", "price_inr": 750.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P035", "name": "Minimalist Retinol 0.3% Night Serum", "brand": "Minimalist", "category": "serum", "concern": "aging", "skin_type": "all", "key_ingredients": "retinol, squalane", "price_inr": 760.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P036", "name": "The Derma Co Alpha Arbutin Serum", "brand": "The Derma Co", "category": "serum", "concern": "pigmentation", "skin_type": "all", "key_ingredients": "alpha arbutin", "price_inr": 600.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P037", "name": "Dot & Key Alpha Arbutin Serum", "brand": "Dot & Key", "category": "serum", "concern": "pigmentation", "skin_type": "all", "key_ingredients": "alpha arbutin", "price_inr": 610.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P038", "name": "Plum Peptide Firming Serum", "brand": "Plum", "category": "serum", "concern": "aging", "skin_type": "all", "key_ingredients": "peptides, niacinamide", "price_inr": 850.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P039", "name": "Mamaearth Peptide Firming Serum", "brand": "Mamaearth", "category": "serum", "concern": "aging", "skin_type": "all", "key_ingredients": "peptides, niacinamide", "price_inr": 860.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P040", "name": "Pilgrim Centella Soothing Serum", "brand": "Pilgrim", "category": "serum", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "centella, panthenol", "price_inr": 550.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P041", "name": "Sugar Pop Centella Soothing Serum", "brand": "Sugar Pop", "category": "serum", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "centella, panthenol", "price_inr": 560.0, "finish": "liquid", "spf": 0, "size": "30ml", "source": "representative"}, {"product_id": "P042", "name": "Cetaphil Gentle Foaming Face Wash", "brand": "Cetaphil", "category": "cleanser", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "glycerin, panthenol", "price_inr": 350.0, "finish": "foam", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P043", "name": "Plum Gentle Foaming Face Wash", "brand": "Plum", "category": "cleanser", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "glycerin, panthenol", "price_inr": 360.0, "finish": "foam", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P044", "name": "Mamaearth Salicylic Acid Face Wash", "brand": "Mamaearth", "category": "cleanser", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "salicylic acid, tea tree", "price_inr": 325.0, "finish": "gel", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P045", "name": "The Derma Co Salicylic Acid Face Wash", "brand": "The Derma Co", "category": "cleanser", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "salicylic acid, tea tree", "price_inr": 335.0, "finish": "gel", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P046", "name": "Simple Vitamin C Brightening Face Wash", "brand": "Simple", "category": "cleanser", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C", "price_inr": 325.0, "finish": "gel", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P047", "name": "Sebamed Vitamin C Brightening Face Wash", "brand": "Sebamed", "category": "cleanser", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C", "price_inr": 335.0, "finish": "gel", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P048", "name": "Foxtale Ubtan Glow Face Wash", "brand": "Foxtale", "category": "cleanser", "concern": "dullness", "skin_type": "all", "key_ingredients": "turmeric, saffron", "price_inr": 275.0, "finish": "cream", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P049", "name": "Minimalist Ubtan Glow Face Wash", "brand": "Minimalist", "category": "cleanser", "concern": "dullness", "skin_type": "all", "key_ingredients": "turmeric, saffron", "price_inr": 285.0, "finish": "cream", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P050", "name": "Cetaphil Hydrating Cream Cleanser", "brand": "Cetaphil", "category": "cleanser", "concern": "dryness", "skin_type": "dry", "key_ingredients": "glycerin, ceramides", "price_inr": 400.0, "finish": "cream", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P051", "name": "Plum Hydrating Cream Cleanser", "brand": "Plum", "category": "cleanser", "concern": "dryness", "skin_type": "dry", "key_ingredients": "glycerin, ceramides", "price_inr": 410.0, "finish": "cream", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P052", "name": "Mamaearth Charcoal Detox Face Wash", "brand": "Mamaearth", "category": "cleanser", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "activated charcoal", "price_inr": 325.0, "finish": "foam", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P053", "name": "The Derma Co Charcoal Detox Face Wash", "brand": "The Derma Co", "category": "cleanser", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "activated charcoal", "price_inr": 335.0, "finish": "foam", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P054", "name": "Cetaphil Oil-Free Gel Moisturizer", "brand": "Cetaphil", "category": "moisturizer", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "niacinamide, glycerin", "price_inr": 425.0, "finish": "gel", "spf": 0, "size": "50ml", "source": "representative"}, {"product_id": "P055", "name": "Neutrogena Oil-Free Gel Moisturizer", "brand": "Neutrogena", "category": "moisturizer", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "niacinamide, glycerin", "price_inr": 435.0, "finish": "gel", "spf": 0, "size": "80ml", "source": "representative"}, {"product_id": "P056", "name": "Dot & Key Ceramide Barrier Cream", "brand": "Dot & Key", "category": "moisturizer", "concern": "dryness", "skin_type": "dry", "key_ingredients": "ceramides, shea butter", "price_inr": 545.0, "finish": "cream", "spf": 0, "size": "80ml", "source": "representative"}, {"product_id": "P057", "name": "Plum Ceramide Barrier Cream", "brand": "Plum", "category": "moisturizer", "concern": "dryness", "skin_type": "dry", "key_ingredients": "ceramides, shea butter", "price_inr": 555.0, "finish": "cream", "spf": 0, "size": "50ml", "source": "representative"}, {"product_id": "P058", "name": "Mamaearth Aloe Soothing Gel", "brand": "Mamaearth", "category": "moisturizer", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "aloe vera, chamomile", "price_inr": 300.0, "finish": "gel", "spf": 0, "size": "50ml", "source": "representative"}, {"product_id": "P059", "name": "Re'equil Aloe Soothing Gel", "brand": "Re'equil", "category": "moisturizer", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "aloe vera, chamomile", "price_inr": 310.0, "finish": "gel", "spf": 0, "size": "80ml", "source": "representative"}, {"product_id": "P060", "name": "Minimalist Vitamin C Day Cream", "brand": "Minimalist", "category": "moisturizer", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, SPF", "price_inr": 500.0, "finish": "cream", "spf": 0, "size": "80ml", "source": "representative"}, {"product_id": "P061", "name": "Pond's Vitamin C Day Cream", "brand": "Pond's", "category": "moisturizer", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, SPF", "price_inr": 510.0, "finish": "cream", "spf": 0, "size": "50ml", "source": "representative"}, {"product_id": "P062", "name": "Cetaphil Hyaluronic Water Cream", "brand": "Cetaphil", "category": "moisturizer", "concern": "dryness", "skin_type": "all", "key_ingredients": "hyaluronic acid", "price_inr": 470.0, "finish": "gel", "spf": 0, "size": "50ml", "source": "representative"}, {"product_id": "P063", "name": "Neutrogena Hyaluronic Water Cream", "brand": "Neutrogena", "category": "moisturizer", "concern": "dryness", "skin_type": "all", "key_ingredients": "hyaluronic acid", "price_inr": 480.0, "finish": "gel", "spf": 0, "size": "80ml", "source": "representative"}, {"product_id": "P064", "name": "Dot & Key Night Repair Cream", "brand": "Dot & Key", "category": "moisturizer", "concern": "aging", "skin_type": "all", "key_ingredients": "retinol, peptides", "price_inr": 700.0, "finish": "cream", "spf": 0, "size": "80ml", "source": "representative"}, {"product_id": "P065", "name": "Plum Night Repair Cream", "brand": "Plum", "category": "moisturizer", "concern": "aging", "skin_type": "all", "key_ingredients": "retinol, peptides", "price_inr": 710.0, "finish": "cream", "spf": 0, "size": "50ml", "source": "representative"}, {"product_id": "P066", "name": "Dot & Key Ultra Light Gel Sunscreen SPF 50", "brand": "Dot & Key", "category": "sunscreen", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "hybrid UV filters", "price_inr": 470.0, "finish": "matte", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P067", "name": "Minimalist Ultra Light Gel Sunscreen SPF 50", "brand": "Minimalist", "category": "sunscreen", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "hybrid UV filters", "price_inr": 480.0, "finish": "matte", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P068", "name": "The Derma Co Hydrating Sunscreen SPF 50 PA++++", "brand": "The Derma Co", "category": "sunscreen", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, UV filters", "price_inr": 495.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P069", "name": "Re'equil Hydrating Sunscreen SPF 50 PA++++", "brand": "Re'equil", "category": "sunscreen", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, UV filters", "price_inr": 505.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P070", "name": "Aqualogica Mineral Sunscreen SPF 30", "brand": "Aqualogica", "category": "sunscreen", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "zinc oxide, titanium dioxide", "price_inr": 550.0, "finish": "matte", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P071", "name": "Foxtale Mineral Sunscreen SPF 30", "brand": "Foxtale", "category": "sunscreen", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "zinc oxide, titanium dioxide", "price_inr": 560.0, "finish": "matte", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P072", "name": "La Shield Tinted Sunscreen SPF 50", "brand": "La Shield", "category": "sunscreen", "concern": "coverage", "skin_type": "all", "key_ingredients": "tint, UV filters", "price_inr": 550.0, "finish": "tinted", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P073", "name": "Lakme Tinted Sunscreen SPF 50", "brand": "Lakme", "category": "sunscreen", "concern": "coverage", "skin_type": "all", "key_ingredients": "tint, UV filters", "price_inr": 560.0, "finish": "tinted", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P074", "name": "Dot & Key Vitamin C Glow Sunscreen SPF 50", "brand": "Dot & Key", "category": "sunscreen", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, UV filters", "price_inr": 495.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P075", "name": "Minimalist Vitamin C Glow Sunscreen SPF 50", "brand": "Minimalist", "category": "sunscreen", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C, UV filters", "price_inr": 505.0, "finish": "dewy", "spf": 50, "size": "50ml", "source": "representative"}, {"product_id": "P076", "name": "Minimalist Rose Hydrating Toner", "brand": "Minimalist", "category": "toner", "concern": "dryness", "skin_type": "dry", "key_ingredients": "rose water, glycerin", "price_inr": 370.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P077", "name": "Plum Rose Hydrating Toner", "brand": "Plum", "category": "toner", "concern": "dryness", "skin_type": "dry", "key_ingredients": "rose water, glycerin", "price_inr": 380.0, "finish": "liquid", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P078", "name": "Dot & Key Salicylic Acid Pore Toner", "brand": "Dot & Key", "category": "toner", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "salicylic acid, witch hazel", "price_inr": 470.0, "finish": "liquid", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P079", "name": "The Derma Co Salicylic Acid Pore Toner", "brand": "The Derma Co", "category": "toner", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "salicylic acid, witch hazel", "price_inr": 480.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P080", "name": "Pilgrim Glycolic Acid Exfoliating Toner", "brand": "Pilgrim", "category": "toner", "concern": "dullness", "skin_type": "all", "key_ingredients": "glycolic acid", "price_inr": 525.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P081", "name": "Minimalist Glycolic Acid Exfoliating Toner", "brand": "Minimalist", "category": "toner", "concern": "dullness", "skin_type": "all", "key_ingredients": "glycolic acid", "price_inr": 535.0, "finish": "liquid", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P082", "name": "Plum Green Tea Clarifying Toner", "brand": "Plum", "category": "toner", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "green tea, niacinamide", "price_inr": 370.0, "finish": "liquid", "spf": 0, "size": "150ml", "source": "representative"}, {"product_id": "P083", "name": "Dot & Key Green Tea Clarifying Toner", "brand": "Dot & Key", "category": "toner", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "green tea, niacinamide", "price_inr": 380.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P084", "name": "Plum Clay Detox Face Mask", "brand": "Plum", "category": "mask", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "kaolin clay, charcoal", "price_inr": 400.0, "finish": "clay", "spf": 0, "size": "50g", "source": "representative"}, {"product_id": "P085", "name": "Mamaearth Clay Detox Face Mask", "brand": "Mamaearth", "category": "mask", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "kaolin clay, charcoal", "price_inr": 410.0, "finish": "clay", "spf": 0, "size": "100g", "source": "representative"}, {"product_id": "P086", "name": "The Face Shop Overnight Sleeping Mask", "brand": "The Face Shop", "category": "mask", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, niacinamide", "price_inr": 520.0, "finish": "gel", "spf": 0, "size": "100g", "source": "representative"}, {"product_id": "P087", "name": "Garnier Overnight Sleeping Mask", "brand": "Garnier", "category": "mask", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid, niacinamide", "price_inr": 530.0, "finish": "gel", "spf": 0, "size": "25g", "source": "representative"}, {"product_id": "P088", "name": "Innisfree Brightening Sheet Mask", "brand": "Innisfree", "category": "mask", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C", "price_inr": 100.0, "finish": "sheet", "spf": 0, "size": "25g", "source": "representative"}, {"product_id": "P089", "name": "Sugar Pop Brightening Sheet Mask", "brand": "Sugar Pop", "category": "mask", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C", "price_inr": 110.0, "finish": "sheet", "spf": 0, "size": "50g", "source": "representative"}, {"product_id": "P090", "name": "Plum Soothing Aloe Mask", "brand": "Plum", "category": "mask", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "aloe, centella", "price_inr": 300.0, "finish": "gel", "spf": 0, "size": "50g", "source": "representative"}, {"product_id": "P091", "name": "Mamaearth Soothing Aloe Mask", "brand": "Mamaearth", "category": "mask", "concern": "sensitivity", "skin_type": "sensitive", "key_ingredients": "aloe, centella", "price_inr": 310.0, "finish": "gel", "spf": 0, "size": "100g", "source": "representative"}, {"product_id": "P092", "name": "Sugar Matte Liquid Lipstick - Brick Red", "brand": "Sugar", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "vitamin E, pigment", "price_inr": 500.0, "finish": "matte", "spf": 0, "size": "4g", "source": "representative"}, {"product_id": "P093", "name": "Maybelline Matte Liquid Lipstick - Mauve Nude", "brand": "Maybelline", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "vitamin E, pigment", "price_inr": 510.0, "finish": "matte", "spf": 0, "size": "5ml", "source": "representative"}, {"product_id": "P094", "name": "Lakme Matte Liquid Lipstick - Coral Crush", "brand": "Lakme", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "vitamin E, pigment", "price_inr": 520.0, "finish": "matte", "spf": 0, "size": "7ml", "source": "representative"}, {"product_id": "P095", "name": "Nykaa Cosmetics Matte Liquid Lipstick - Berry Bold", "brand": "Nykaa Cosmetics", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "vitamin E, pigment", "price_inr": 530.0, "finish": "matte", "spf": 0, "size": "4g", "source": "representative"}, {"product_id": "P096", "name": "Sugar Pop Creamy Bullet Lipstick - Brick Red", "brand": "Sugar Pop", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "shea butter, pigment", "price_inr": 450.0, "finish": "cream", "spf": 0, "size": "5ml", "source": "representative"}, {"product_id": "P097", "name": "MyGlamm Creamy Bullet Lipstick - Mauve Nude", "brand": "MyGlamm", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "shea butter, pigment", "price_inr": 460.0, "finish": "cream", "spf": 0, "size": "7ml", "source": "representative"}, {"product_id": "P098", "name": "Faces Canada Creamy Bullet Lipstick - Coral Crush", "brand": "Faces Canada", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "shea butter, pigment", "price_inr": 470.0, "finish": "cream", "spf": 0, "size": "4g", "source": "representative"}, {"product_id": "P099", "name": "Sugar Creamy Bullet Lipstick - Berry Bold", "brand": "Sugar", "category": "lip", "concern": "longwear", "skin_type": "all", "key_ingredients": "shea butter, pigment", "price_inr": 480.0, "finish": "cream", "spf": 0, "size": "5ml", "source": "representative"}, {"product_id": "P100", "name": "Maybelline Tinted Lip Balm - Brick Red", "brand": "Maybelline", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "shea butter, vitamin E", "price_inr": 300.0, "finish": "sheer", "spf": 0, "size": "7ml", "source": "representative"}, {"product_id": "P101", "name": "Lakme Tinted Lip Balm - Mauve Nude", "brand": "Lakme", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "shea butter, vitamin E", "price_inr": 310.0, "finish": "sheer", "spf": 0, "size": "4g", "source": "representative"}, {"product_id": "P102", "name": "Nykaa Cosmetics Tinted Lip Balm - Coral Crush", "brand": "Nykaa Cosmetics", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "shea butter, vitamin E", "price_inr": 320.0, "finish": "sheer", "spf": 0, "size": "5ml", "source": "representative"}, {"product_id": "P103", "name": "Sugar Pop Tinted Lip Balm - Berry Bold", "brand": "Sugar Pop", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "shea butter, vitamin E", "price_inr": 330.0, "finish": "sheer", "spf": 0, "size": "7ml", "source": "representative"}, {"product_id": "P104", "name": "MyGlamm Glossy Lip Oil - Brick Red", "brand": "MyGlamm", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "jojoba oil, vitamin E", "price_inr": 400.0, "finish": "glossy", "spf": 0, "size": "4g", "source": "representative"}, {"product_id": "P105", "name": "Faces Canada Glossy Lip Oil - Mauve Nude", "brand": "Faces Canada", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "jojoba oil, vitamin E", "price_inr": 410.0, "finish": "glossy", "spf": 0, "size": "5ml", "source": "representative"}, {"product_id": "P106", "name": "Sugar Glossy Lip Oil - Coral Crush", "brand": "Sugar", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "jojoba oil, vitamin E", "price_inr": 420.0, "finish": "glossy", "spf": 0, "size": "7ml", "source": "representative"}, {"product_id": "P107", "name": "Maybelline Glossy Lip Oil - Berry Bold", "brand": "Maybelline", "category": "lip", "concern": "dryness", "skin_type": "all", "key_ingredients": "jojoba oil, vitamin E", "price_inr": 430.0, "finish": "glossy", "spf": 0, "size": "4g", "source": "representative"}, {"product_id": "P108", "name": "Lakme Matte Liquid Foundation - Fair", "brand": "Lakme", "category": "foundation", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "perlite, silica", "price_inr": 675.0, "finish": "matte", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P109", "name": "Maybelline Matte Liquid Foundation - Light", "brand": "Maybelline", "category": "foundation", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "perlite, silica", "price_inr": 685.0, "finish": "matte", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P110", "name": "L'Oreal Paris Matte Liquid Foundation - Natural", "brand": "L'Oreal Paris", "category": "foundation", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "perlite, silica", "price_inr": 695.0, "finish": "matte", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P111", "name": "Nykaa Cosmetics Matte Liquid Foundation - Wheatish", "brand": "Nykaa Cosmetics", "category": "foundation", "concern": "oily skin", "skin_type": "oily", "key_ingredients": "perlite, silica", "price_inr": 705.0, "finish": "matte", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P112", "name": "Faces Canada Hydrating Serum Foundation - Fair", "brand": "Faces Canada", "category": "foundation", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid", "price_inr": 775.0, "finish": "dewy", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P113", "name": "SUGAR Hydrating Serum Foundation - Light", "brand": "SUGAR", "category": "foundation", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid", "price_inr": 785.0, "finish": "dewy", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P114", "name": "Lakme Hydrating Serum Foundation - Natural", "brand": "Lakme", "category": "foundation", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid", "price_inr": 795.0, "finish": "dewy", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P115", "name": "Maybelline Hydrating Serum Foundation - Wheatish", "brand": "Maybelline", "category": "foundation", "concern": "dryness", "skin_type": "dry", "key_ingredients": "hyaluronic acid", "price_inr": 805.0, "finish": "dewy", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P116", "name": "L'Oreal Paris Buildable Natural Foundation - Fair", "brand": "L'Oreal Paris", "category": "foundation", "concern": "coverage", "skin_type": "all", "key_ingredients": "glycerin, vitamin E", "price_inr": 700.0, "finish": "natural", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P117", "name": "Nykaa Cosmetics Buildable Natural Foundation - Light", "brand": "Nykaa Cosmetics", "category": "foundation", "concern": "coverage", "skin_type": "all", "key_ingredients": "glycerin, vitamin E", "price_inr": 710.0, "finish": "natural", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P118", "name": "Faces Canada Buildable Natural Foundation - Natural", "brand": "Faces Canada", "category": "foundation", "concern": "coverage", "skin_type": "all", "key_ingredients": "glycerin, vitamin E", "price_inr": 720.0, "finish": "natural", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P119", "name": "SUGAR Buildable Natural Foundation - Wheatish", "brand": "SUGAR", "category": "foundation", "concern": "coverage", "skin_type": "all", "key_ingredients": "glycerin, vitamin E", "price_inr": 730.0, "finish": "natural", "spf": 15, "size": "30ml", "source": "representative"}, {"product_id": "P120", "name": "Maybelline Intense Kajal", "brand": "Maybelline", "category": "eye makeup", "concern": "longwear", "skin_type": "sensitive", "key_ingredients": "carnauba wax", "price_inr": 250.0, "finish": "matte", "spf": 0, "size": "1.2g", "source": "representative"}, {"product_id": "P121", "name": "Lakme Intense Kajal", "brand": "Lakme", "category": "eye makeup", "concern": "longwear", "skin_type": "sensitive", "key_ingredients": "carnauba wax", "price_inr": 260.0, "finish": "matte", "spf": 0, "size": "9ml", "source": "representative"}, {"product_id": "P122", "name": "Sugar Volumizing Mascara", "brand": "Sugar", "category": "eye makeup", "concern": "longwear", "skin_type": "all", "key_ingredients": "film polymers", "price_inr": 450.0, "finish": "matte", "spf": 0, "size": "9ml", "source": "representative"}, {"product_id": "P123", "name": "Nykaa Cosmetics Volumizing Mascara", "brand": "Nykaa Cosmetics", "category": "eye makeup", "concern": "longwear", "skin_type": "all", "key_ingredients": "film polymers", "price_inr": 460.0, "finish": "matte", "spf": 0, "size": "2.5ml", "source": "representative"}, {"product_id": "P124", "name": "Faces Canada Liquid Eyeliner", "brand": "Faces Canada", "category": "eye makeup", "concern": "longwear", "skin_type": "all", "key_ingredients": "pigment, polymers", "price_inr": 325.0, "finish": "matte", "spf": 0, "size": "2.5ml", "source": "representative"}, {"product_id": "P125", "name": "MyGlamm Liquid Eyeliner", "brand": "MyGlamm", "category": "eye makeup", "concern": "longwear", "skin_type": "all", "key_ingredients": "pigment, polymers", "price_inr": 335.0, "finish": "matte", "spf": 0, "size": "10g", "source": "representative"}, {"product_id": "P126", "name": "Maybelline Eyeshadow Palette", "brand": "Maybelline", "category": "eye makeup", "concern": "coverage", "skin_type": "all", "key_ingredients": "mica, pigment", "price_inr": 900.0, "finish": "shimmer", "spf": 0, "size": "10g", "source": "representative"}, {"product_id": "P127", "name": "Lakme Eyeshadow Palette", "brand": "Lakme", "category": "eye makeup", "concern": "coverage", "skin_type": "all", "key_ingredients": "mica, pigment", "price_inr": 910.0, "finish": "shimmer", "spf": 0, "size": "1.2g", "source": "representative"}, {"product_id": "P128", "name": "Mamaearth Onion Hair Growth Shampoo", "brand": "Mamaearth", "category": "haircare", "concern": "hair fall", "skin_type": "all", "key_ingredients": "onion oil, biotin", "price_inr": 400.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P129", "name": "WOW Skin Science Onion Hair Growth Shampoo", "brand": "WOW Skin Science", "category": "haircare", "concern": "hair fall", "skin_type": "all", "key_ingredients": "onion oil, biotin", "price_inr": 410.0, "finish": "liquid", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P130", "name": "Pilgrim Rosemary Scalp Serum", "brand": "Pilgrim", "category": "haircare", "concern": "hair fall", "skin_type": "all", "key_ingredients": "rosemary, redensyl", "price_inr": 550.0, "finish": "liquid", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P131", "name": "The Tribe Concepts Rosemary Scalp Serum", "brand": "The Tribe Concepts", "category": "haircare", "concern": "hair fall", "skin_type": "all", "key_ingredients": "rosemary, redensyl", "price_inr": 560.0, "finish": "liquid", "spf": 0, "size": "250ml", "source": "representative"}, {"product_id": "P132", "name": "L'Oreal Paris Anti-Dandruff Shampoo", "brand": "L'Oreal Paris", "category": "haircare", "concern": "dandruff", "skin_type": "all", "key_ingredients": "ketoconazole, tea tree", "price_inr": 425.0, "finish": "liquid", "spf": 0, "size": "250ml", "source": "representative"}, {"product_id": "P133", "name": "Tresemme Anti-Dandruff Shampoo", "brand": "Tresemme", "category": "haircare", "concern": "dandruff", "skin_type": "all", "key_ingredients": "ketoconazole, tea tree", "price_inr": 435.0, "finish": "liquid", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P134", "name": "Mamaearth Hair Repair Conditioner", "brand": "Mamaearth", "category": "haircare", "concern": "dryness", "skin_type": "dry", "key_ingredients": "argan oil, keratin", "price_inr": 425.0, "finish": "cream", "spf": 0, "size": "100ml", "source": "representative"}, {"product_id": "P135", "name": "WOW Skin Science Hair Repair Conditioner", "brand": "WOW Skin Science", "category": "haircare", "concern": "dryness", "skin_type": "dry", "key_ingredients": "argan oil, keratin", "price_inr": 435.0, "finish": "cream", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P136", "name": "Pilgrim Hair Growth Oil", "brand": "Pilgrim", "category": "haircare", "concern": "hair fall", "skin_type": "all", "key_ingredients": "bhringraj, amla", "price_inr": 350.0, "finish": "oil", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P137", "name": "The Tribe Concepts Hair Growth Oil", "brand": "The Tribe Concepts", "category": "haircare", "concern": "hair fall", "skin_type": "all", "key_ingredients": "bhringraj, amla", "price_inr": 360.0, "finish": "oil", "spf": 0, "size": "250ml", "source": "representative"}, {"product_id": "P138", "name": "Plum Body Lotion Deep Moisture", "brand": "Plum", "category": "body care", "concern": "dryness", "skin_type": "dry", "key_ingredients": "shea butter, glycerin", "price_inr": 350.0, "finish": "cream", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P139", "name": "Mamaearth Body Lotion Deep Moisture", "brand": "Mamaearth", "category": "body care", "concern": "dryness", "skin_type": "dry", "key_ingredients": "shea butter, glycerin", "price_inr": 360.0, "finish": "cream", "spf": 0, "size": "300ml", "source": "representative"}, {"product_id": "P140", "name": "Nivea Vitamin C Body Wash", "brand": "Nivea", "category": "body care", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C", "price_inr": 300.0, "finish": "gel", "spf": 0, "size": "300ml", "source": "representative"}, {"product_id": "P141", "name": "The Body Shop Vitamin C Body Wash", "brand": "The Body Shop", "category": "body care", "concern": "dullness", "skin_type": "all", "key_ingredients": "vitamin C", "price_inr": 310.0, "finish": "gel", "spf": 0, "size": "100g", "source": "representative"}, {"product_id": "P142", "name": "Dove Coffee Body Scrub", "brand": "Dove", "category": "body care", "concern": "dullness", "skin_type": "all", "key_ingredients": "coffee, walnut", "price_inr": 425.0, "finish": "scrub", "spf": 0, "size": "100g", "source": "representative"}, {"product_id": "P143", "name": "Cetaphil Coffee Body Scrub", "brand": "Cetaphil", "category": "body care", "concern": "dullness", "skin_type": "all", "key_ingredients": "coffee, walnut", "price_inr": 435.0, "finish": "scrub", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P144", "name": "Plum Soothing Body Butter", "brand": "Plum", "category": "body care", "concern": "dryness", "skin_type": "sensitive", "key_ingredients": "cocoa butter, aloe", "price_inr": 595.0, "finish": "cream", "spf": 0, "size": "200ml", "source": "representative"}, {"product_id": "P145", "name": "Mamaearth Soothing Body Butter", "brand": "Mamaearth", "category": "body care", "concern": "dryness", "skin_type": "sensitive", "key_ingredients": "cocoa butter, aloe", "price_inr": 605.0, "finish": "cream", "spf": 0, "size": "300ml", "source": "representative"}];
+
+// ---- Real product images (Shopify CDN, hotlink-OK). Missing ids fall back to a tile. ----
+const PROD_IMAGES = {
+  "P002":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/Nia_05_10ml_1_1e27f2ef-09d0-4140-bf9e-05d62459489e.jpg?v=1756982138",
+  "P003":"https://cdn.shopify.com/s/files/1/0410/9608/5665/products/SalicylicAcid2_1200-1-min.png?v=1646458899",
+  "P004":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/Vit16New.png?v=1721398127",
+  "P005":"https://cdn.shopify.com/s/files/1/0410/9608/5665/products/HAPGA2_1200-1-min.png?v=1646395962",
+  "P006":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/AlphaArNew.png?v=1721397838",
+  "P007":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/GlycolicNew.png?v=1721398128",
+  "P008":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/SalicylicCleanserNew.jpg?v=1756796206",
+  "P010":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/KRetinalNew.png?v=1721632054",
+  "P011":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/VitaminCSunscreenListing1-1_637b02a6-7537-475e-989f-bd472a2e415c.jpg?v=1778839085",
+  "P012":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/1a_3ef32ac6-5192-495c-b4bb-dafb0e806260.jpg?v=1778839652",
+  "P013":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/Artboard_1_copy_c38bbbf3-ec26-4add-9b79-df3f9eb96600.jpg?v=1772446737",
+  "P014":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/1a_055631d9-8489-46d1-bddf-bd21e2b6e9aa.jpg?v=1771219495",
+  "P015":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/1_b1e08716-cac1-4066-8010-dfb012ae9f2a.jpg?v=1781243511",
+  "P017":"https://cdn.shopify.com/s/files/1/0390/2985/files/Listing_1st_Tile_GT_FW_150ml_1001x1001_px.webp?v=1779351297",
+  "P026":"https://cdn.shopify.com/s/files/1/0888/8057/8807/files/2_PDP_5a75dfc1-fd49-4bc1-83bd-a10219434a8d.jpg?v=1780310213",
+  "P027":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/VitaminCSerum.jpg?v=1767698235",
+  "P028":"https://cdn.shopify.com/s/files/1/0390/2985/files/Listing_1st_Tile_BY_Cell_Renewal_Serum_1001x1001_px.webp?v=1776937141",
+  "P030":"https://cdn.shopify.com/s/files/1/0620/1629/1045/files/1_d35d2da5-6bc6-47b1-8188-f05726489b6f.jpg?v=1767688962",
+  "P033":"https://cdn.shopify.com/s/files/1/0306/6262/3364/files/Acne_Clarifying_Gel.webp?v=1770666591",
+  "P035":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/Reti3New.png?v=1721398129",
+  "P036":"https://cdn.shopify.com/s/files/1/0888/8057/8807/files/2_-kojic-acide-serum-8ml-front.jpg?v=1758287026",
+  "P045":"https://cdn.shopify.com/s/files/1/0888/8057/8807/files/pdp_2_salicylic_fw.jpg?v=1758287053",
+  "P057":"https://cdn.shopify.com/s/files/1/0390/2985/files/Listing_1st_Tile_Oat_Face_Cream_1001x1001_px.webp?v=1776937678",
+  "P064":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/1_7.jpg?v=1764061107",
+  "P065":"https://cdn.shopify.com/s/files/1/0390/2985/files/Listing_1st_Tile_Reservarol_Gel_1001x1001_px_e3042b2e-a8b9-4553-b2d4-b94f9bf9b640.webp?v=1775811675",
+  "P068":"https://cdn.shopify.com/s/files/1/0888/8057/8807/files/hydrating-ss-pack-of-2-fop.jpg?v=1758287199",
+  "P074":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/VitaminCSunscreenListing1-1_637b02a6-7537-475e-989f-bd472a2e415c.jpg?v=1778839085",
+  "P077":"https://cdn.shopify.com/s/files/1/0390/2985/files/Listing_1st_Tile_HA_Toner_150ml_1001x1001_px.webp?v=1776939428",
+  "P078":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/1-Cica-Body-Wash.jpg?v=1721987269",
+  "P079":"https://cdn.shopify.com/s/files/1/0888/8057/8807/files/pdp_2_salicylic_fw.jpg?v=1758287053",
+  "P080":"https://cdn.shopify.com/s/files/1/0620/1629/1045/files/1_9d4d4501-54a6-481c-a7f8-21ab4ea741e8.jpg?v=1763037821",
+  "P081":"https://cdn.shopify.com/s/files/1/0410/9608/5665/files/GlycolicNew.png?v=1721398128",
+  "P082":"https://cdn.shopify.com/s/files/1/0390/2985/files/Combo-SKUs-Nia-CM-1st-Tile-1001x1001-px.webp?v=1778053168",
+  "P083":"https://cdn.shopify.com/s/files/1/0361/8553/8692/files/1_2_87c2f2cf-90da-4ec5-82ce-0e8415d76c59.jpg?v=1765797060",
+  "P092":"https://cdn.shopify.com/s/files/1/0906/2558/files/Nothing-Else-Matter-Longwear-Lipstick-31-Simmer-Brown-Milk-Chocolate-Brown-Almond-Brown.jpg?v=1743677347",
+  "P103":"https://cdn.shopify.com/s/files/1/0906/2558/files/Tipsy-Lips-Moisturizing-Balm_bd2f8c5d.jpg?v=1749811368",
+  "P106":"https://cdn.shopify.com/s/files/1/0906/2558/files/Tipsy-Lips-Moisturizing-Balm_bd2f8c5d.jpg?v=1749811368",
+  "P114":"https://cdn.shopify.com/s/files/1/0014/3514/0183/files/67004_H-8909106029095.jpg?v=1738220196",
+  "P130":"https://cdn.shopify.com/s/files/1/0620/1629/1045/files/1_efe42d79-9963-48d2-a1a8-5d86972a7563.jpg?v=1779712591",
+  "P137":"https://cdn.shopify.com/s/files/1/0284/5599/3449/files/1_17.webp?v=1777024514"
+};
+
+
+// ---- State ----
+let cart = {}; // product_id -> qty
+
+// ---- Render storefront ----
+const swatchColors = {
+  serum:"#b3006e", sunscreen:"#e08a21", cleanser:"#2196a8", toner:"#7a4fb3",
+  lip:"#d6336c", foundation:"#a86b3c", primer:"#6b8e23", "eye makeup":"#3a3a5a",
+  "eye care":"#4a7a9d", concealer:"#9d6b4a", mask:"#5fa86b",
+  moisturizer:"#2e8b80", haircare:"#8a5a2b", "body care":"#3f7fb0"
+};
+const catEmoji = {
+  serum:"💧", sunscreen:"☀️", cleanser:"🧼", toner:"🌿", lip:"💄",
+  foundation:"🎨", primer:"✨", "eye makeup":"👁️", "eye care":"💎",
+  concealer:"🖌️", mask:"🧖", moisturizer:"🧴", haircare:"💆", "body care":"🛁"
+};
+function fmt(n){return "₹"+Math.round(n)}
+
+// Real Nykaa link for a product — opens its page on nykaa.com to buy for real.
+function nykaaUrl(p){
+  const q = p.name.toLowerCase().includes(p.brand.toLowerCase()) ? p.name : (p.brand + " " + p.name);
+  return "https://www.nykaa.com/search/result/?q=" + encodeURIComponent(q);
+}
+
+// Self-contained product "image": a category-coloured gradient tile + icon.
+function prodFill(p){ const c=swatchColors[p.category]||'#b3006e'; return `background:linear-gradient(155deg,${c},${c}aa)`; }
+// Card image: real product photo when we have one (with tile fallback on load error), else the tile.
+function prodImg(p){
+  const url=PROD_IMAGES[p.product_id], em=catEmoji[p.category]||"💄";
+  const tile=`<div class="prodimg" style="display:${url?'none':'flex'};position:absolute;inset:0;${prodFill(p)}">
+      <span class="emoji">${em}</span><span class="tag">${p.category} · ${p.size}</span></div>`;
+  const img=url?`<img src="${url}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;background:#fff"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:"";
+  return `<div class="prodimg" style="padding:0;background:#fff;overflow:hidden">${img}${tile}</div>`;
+}
+// Small square thumbnail (cart drawer + checkout) — same real-photo-with-fallback logic.
+function prodThumb(p,size){
+  const url=PROD_IMAGES[p.product_id], em=catEmoji[p.category]||"💄";
+  const tile=`<div style="display:${url?'none':'flex'};position:absolute;inset:0;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;${prodFill(p)}">${em}</div>`;
+  const img=url?`<img src="${url}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;background:#fff"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:"";
+  return `<div style="width:${size}px;height:${size}px;flex:none;border-radius:8px;overflow:hidden;position:relative">${img}${tile}</div>`;
+}
+function toast(msg){
+  let t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function grid(){
+  // products with a real image float to the top; the rest (icon tiles) sink to the bottom
+  const ordered = [...CATALOG].sort((a,b)=>(PROD_IMAGES[b.product_id]?1:0)-(PROD_IMAGES[a.product_id]?1:0));
+  document.getElementById('grid').innerHTML = ordered.map(p=>`
+    <div class="card">
+      <a href="${nykaaUrl(p)}" target="_blank" rel="noopener" title="View on Nykaa">${prodImg(p)}</a>
+      <div class="brand">${p.brand}</div>
+      <a class="pname" href="${nykaaUrl(p)}" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:inherit">${p.name}</a>
+      <div class="price">${fmt(p.price_inr)}</div>
+      <button class="add" onclick="addToCart('${p.product_id}',1,true)">Add to Bag</button>
+    </div>`).join('');
+}
+grid();
+
+// ---- Cart ops ----
+function addToCart(id,q=1,reveal=false){
+  cart[id]=(cart[id]||0)+q; renderCart();
+  if(reveal){ const p=CATALOG.find(x=>x.product_id===id); toggleCart(true); toast(`Added ${p?p.brand:"item"} to bag ✓`); }
+}
+function setQty(id,q){ if(q<=0) delete cart[id]; else cart[id]=q; renderCart(); }
+function removeItem(id){ delete cart[id]; renderCart(); }
+function cartList(){ return Object.entries(cart).map(([id,q])=>({p:CATALOG.find(x=>x.product_id===id),q})); }
+function cartTotal(){ return cartList().reduce((s,{p,q})=>s+p.price_inr*q,0); }
+function cartCount(){ return cartList().reduce((s,{q})=>s+q,0); }
+
+function renderCart(){
+  document.getElementById('cartCount').textContent = cartCount();
+  const items = cartList();
+  const box = document.getElementById('cartItems');
+  if(!items.length){ box.innerHTML = `<div class="empty">Your bag is empty. Ask the advisor to add something!</div>`; }
+  else{
+    box.innerHTML = items.map(({p,q})=>`
+      <div class="ci">
+        ${prodThumb(p,46)}
+        <div class="meta">
+          <div class="n">${p.name}</div>
+          <div class="b">${p.brand} · ${fmt(p.price_inr)}</div>
+          <div class="qty">
+            <button onclick="setQty('${p.product_id}',${q-1})">−</button>
+            <span>${q}</span>
+            <button onclick="setQty('${p.product_id}',${q+1})">+</button>
+            <button class="rm" onclick="removeItem('${p.product_id}')">remove</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('subtotal').textContent = fmt(cartTotal());
+  document.getElementById('total').textContent = fmt(cartTotal());
+}
+renderCart();
+
+function toggleCart(open){ document.getElementById('drawer').classList.toggle('open',open); }
+
+// ---- Checkout ----
+function checkout(){
+  const items = cartList();
+  if(!items.length){ agentSay("Your bag is empty — tell me what you'd like and I'll add it."); togglePanel(true); return; }
+  document.getElementById('orderLines').innerHTML =
+    items.map(({p,q})=>`<div class="l">
+        <a href="${nykaaUrl(p)}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;flex:1;min-width:0">
+          ${prodThumb(p,30)}
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name} ×${q}<br><span class="buy">Buy on Nykaa →</span></span>
+        </a>
+        <span>${fmt(p.price_inr*q)}</span>
+      </div>`).join('')
+    + `<div class="l tot"><span>Total</span><span>${fmt(cartTotal())}</span></div>`;
+  document.getElementById('modal').classList.add('open');
+}
+// Open ONE Nykaa search tab containing ALL bagged items at once (e.g.
+// "Dot & Key sunscreen Pilgrim serum") — Nykaa's search shows every match, and a
+// single pop-up isn't blocked the way multiple tabs are.
+function openOnNykaa(){
+  const items = cartList();
+  if(!items.length) return;
+  // one concise term per item (brand + category), de-duplicated
+  const terms = [...new Set(items.map(({p})=>`${p.brand} ${p.category}`))].join(" ");
+  const url = "https://www.nykaa.com/search/result/?q=" + encodeURIComponent(terms);
+  const w = window.open(url, "_blank");
+  if(w){ try{ w.opener=null; }catch(_){} }
+  else { toast("Allow pop-ups for this site to open your bag on Nykaa."); }
+}
+function closeCheckout(){ document.getElementById('modal').classList.remove('open'); }
+// "Clear bag" — only empties when the user explicitly asks; checkout never wipes it.
+function resetOrder(){ cart={}; renderCart(); document.getElementById('modal').classList.remove('open'); toggleCart(false); }
+
+// ---- Floating agent ----
+function togglePanel(force){
+  const p=document.getElementById('panel');
+  const open = force===undefined ? !p.classList.contains('open') : force;
+  p.classList.toggle('open',open);
+  if(open && !document.getElementById('msgs').children.length){
+    agentSay("Hey! I'm Nebula, your Nykaa beauty bestie — I can find products, build a routine, and fill your bag for you. What's the vibe today?");
+    showChips(["sunscreen for oily skin under 500","add a niacinamide serum","daytime routine for oily skin","show me lipsticks"]);
+  }
+}
+function agentSay(t,cls="bot"){
+  const m=document.createElement('div'); m.className="m "+cls; m.textContent=t;
+  document.getElementById('msgs').appendChild(m);
+  document.getElementById('msgs').scrollTop=1e9;
+}
+function agentAct(t){ agentSay("🛍️ "+t,"act"); }
+function showChips(arr){
+  document.getElementById('chips').innerHTML = arr.map(c=>`<button class="chip" onclick="quick('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('');
+}
+function quick(t){ document.getElementById('input').value=t; send(); }
+
+function send(){
+  const inp=document.getElementById('input'); const text=inp.value.trim(); if(!text) return;
+  agentSay(text,"user"); inp.value=""; document.getElementById('chips').innerHTML="";
+  setTimeout(()=>handle(text),250);
+}
+
+// ---- The "brain" ----
+// handle(): asks the Gemini-powered backend (server.py -> app/advisor.py) for a
+// grounded recommendation and acts on the cart. If the backend isn't reachable
+// (e.g. the file was opened directly with no server), it transparently falls
+// back to the offline rule-based brain below, so the page always works.
+const ADVISOR_API = "/api/advise";
+
+// Short rolling memory of the chat so follow-ups ("make it cheaper") have context.
+let convo = [];
+function remember(role, text){ convo.push(role + ": " + text); if(convo.length > 8) convo = convo.slice(-8); }
+// Context sent to the backend: recent turns + what's currently in the bag.
+function convoContext(){
+  let ctx = convo.slice(-6).join("\n");
+  const bag = cartList().map(({p,q})=>`${p.name} (₹${p.price_inr}) x${q}`).join("; ");
+  if(bag) ctx += (ctx?"\n":"") + "Current bag: " + bag;
+  return ctx;
+}
+
+async function handle(text){
+  const q=text.toLowerCase();
+  const m=q.match(/(?:under|below|less than|upto|up to|within)\s*₹?\s*(\d{2,5})/);
+  const budget = m?parseInt(m[1]):null;
+
+  // Pure UI actions are deterministic — handle them instantly, no round-trip.
+  if(/checkout|pay|place order|buy now|done/.test(q)){
+    if(!cartCount()){ agentSay("Your bag's empty — add something first and I'll take you to checkout."); return; }
+    agentAct("Taking you to checkout…"); checkout(); return;
+  }
+  if(/clear|empty|remove all/.test(q)){ cart={}; renderCart(); convo=[]; agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
+  if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
+
+  // Everything else → the real Gemini brain on the backend, with conversation context.
+  const history = convoContext();
+  const typing = agentTyping();
+  try{
+    const r = await fetch(ADVISOR_API, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({query:text, history:history, max_price:budget})
+    });
+    if(!r.ok) throw new Error("backend "+r.status);
+    const data = await r.json();
+    typing.remove();
+    if(!data.answer) throw new Error(data.error||"no answer");
+    applyAdvice(data.answer, text);
+  }catch(e){
+    typing.remove();
+    // Don't hide failures — tell the user we dropped to the basic offline brain.
+    agentSay("· couldn't reach Nebula's AI — using basic offline mode ·", "sys");
+    handleOffline(text);
+  }
+}
+
+// Turn the advisor's structured JSON into cart actions + chat, and remember the turn.
+function applyAdvice(ans, userText){
+  const recs = (ans.recommendations||[]).filter(r=>CATALOG.find(x=>x.product_id===r.product_id));
+  if(!recs.length){
+    let msg = ans.intro || "";
+    if(ans.clarifying_question) msg += (msg?"\n\n":"")+"❓ "+ans.clarifying_question;
+    if(ans.note) msg += (msg?"\n\n":"")+"ℹ️ "+ans.note;
+    msg = msg || "I couldn't find a match — try a category like serum, sunscreen, cleanser, or a concern like oily/dry.";
+    agentSay(msg);
+    if(userText){ remember("User", userText); remember("Nebula", msg); }
+    return;
+  }
+  recs.forEach(r=>addToCart(r.product_id));
+  agentAct(`Added ${recs.length} product(s) to your bag.`);
+  let msg = (ans.intro?ans.intro+"\n":"") +
+    recs.map(r=>`• ${r.name} — ${fmt(r.price_inr)}${r.why?" — "+r.why:""}`).join("\n") +
+    `\n\nTotal: ${fmt(ans.total_inr || recs.reduce((s,r)=>s+r.price_inr,0))}.`;
+  if(ans.note) msg += "\n\nℹ️ "+ans.note;
+  if(ans.within_budget===false) msg += "\n\n⚠️ This is over the budget you mentioned.";
+  agentSay(msg);
+  if(userText){ remember("User", userText); remember("Nebula", (ans.intro||"") + " Suggested: " + recs.map(r=>r.name).join(", ")); }
+  toggleCart(true);
+  showChips(["proceed to checkout","make it cheaper","clear my bag"]);
+}
+
+// A small "typing…" bubble shown while Gemini thinks; returns a node to remove.
+function agentTyping(){
+  const m=document.createElement('div'); m.className="m bot"; m.textContent="…thinking";
+  document.getElementById('msgs').appendChild(m);
+  document.getElementById('msgs').scrollTop=1e9;
+  return m;
+}
+
+// ---- Offline fallback brain (used only when the backend is unreachable) ----
+function handleOffline(text){
+  const q=text.toLowerCase();
+
+  // budget
+  const m=q.match(/(?:under|below|less than|upto|up to|within)\s*₹?\s*(\d{2,5})/);
+  const budget = m?parseInt(m[1]):null;
+
+  // checkout intent
+  if(/checkout|pay|place order|buy now|done/.test(q)){
+    if(!cartCount()){ agentSay("Your bag's empty — add something first and I'll take you to checkout."); return; }
+    agentAct("Taking you to checkout…"); checkout(); return;
+  }
+  // clear/empty
+  if(/clear|empty|remove all/.test(q)){ cart={}; renderCart(); agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
+  // show bag
+  if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
+
+  // safety: medical-sounding
+  if(/(cystic|bleeding|painful|burning|rash|infection|eczema|rosacea|allergic)/.test(q)){
+    agentSay("That sounds like something a dermatologist should look at first — I'd hold off on recommending actives for a painful or reacting skin condition. Once a doctor clears it, I'm happy to suggest gentle options.");
+    return;
+  }
+
+  // routine intent
+  if(/routine|regimen/.test(q)){
+    const dry=/dry/.test(q), sens=/sensitiv/.test(q), oily=/oily|acne/.test(q);
+    const st = sens?"sensitive":dry?"dry":oily?"oily":"all";
+    const picks=buildRoutine(st,budget);
+    if(!picks.length){ agentSay("I couldn't fit a routine in that budget. Want me to drop the budget or pick just the essentials?"); return; }
+    picks.forEach(p=>addToCart(p.product_id));
+    agentAct(`Added ${picks.length} products to your bag.`);
+    agentSay("Here's a daytime routine I built for "+st+" skin:\n"+picks.map(p=>`• ${p.name} — ${fmt(p.price_inr)}`).join("\n")+`\n\nTotal: ${fmt(picks.reduce((s,p)=>s+p.price_inr,0))}. Say “checkout” when ready, or ask me to swap anything.`);
+    toggleCart(true);
+    showChips(["proceed to checkout","make it cheaper","add a lipstick"]);
+    return;
+  }
+
+  // otherwise: product search + auto-add (or just show)
+  const justShow=/show|see|browse|list|what.*have/.test(q) && !/add|put|want|need|buy|get/.test(q);
+  let results=searchCatalog(q,budget);
+  if(!results.length){ agentSay("I couldn't find a match in the catalog for that. Try a category like serum, sunscreen, cleanser, lipstick, or a concern like oily/dry/dullness."); return; }
+
+  if(justShow){
+    agentSay("Here's what I found:\n"+results.slice(0,4).map(p=>`• ${p.name} (${p.brand}) — ${fmt(p.price_inr)}`).join("\n")+"\n\nWant me to add any? Just say “add the first one” or name it.");
+    showChips(results.slice(0,3).map(p=>"add "+p.brand+" "+p.category));
+    return;
+  }
+  // auto-add best match
+  const pick=results[0];
+  addToCart(pick.product_id);
+  agentAct(`Added “${pick.name}” to your bag.`);
+  agentSay(`Done! ${pick.name} (${fmt(pick.price_inr)}) is in your bag.${results[1]?` I also have ${results[1].name} if you'd prefer that.`:""}\nSay “checkout” when ready.`);
+  toggleCart(true);
+  showChips(["proceed to checkout","add a sunscreen too","show similar"]);
+}
+
+// Map query words (plurals/synonyms) to catalog category names — mirrors the
+// server-side fix in app/retrieval.py so "lipsticks" matches the "lip" category.
+const CAT_SYN = {
+  lipstick:"lip",lipsticks:"lip",lips:"lip",lip:"lip",lipbalm:"lip",gloss:"lip",
+  sunscreen:"sunscreen",sunscreens:"sunscreen",sunblock:"sunscreen",spf:"sunscreen",
+  moisturiser:"moisturizer",moisturisers:"moisturizer",moisturizer:"moisturizer",moisturizers:"moisturizer",cream:"moisturizer",lotion:"moisturizer",
+  cleanser:"cleanser",cleansers:"cleanser",facewash:"cleanser",wash:"cleanser",
+  serum:"serum",serums:"serum",toner:"toner",toners:"toner",
+  foundation:"foundation",concealer:"concealer",primer:"primer",
+  mascara:"eye makeup",kajal:"eye makeup",eyeliner:"eye makeup",eyeshadow:"eye makeup",
+  shampoo:"haircare",conditioner:"haircare",hair:"haircare",mask:"mask",scrub:"body care"
+};
+function searchCatalog(q,budget){
+  const tokens=q.split(/[^a-z0-9]+/).filter(Boolean);
+  const wantCats=new Set(tokens.map(t=>CAT_SYN[t]).filter(Boolean));
+  const wordMatch=(w)=>tokens.some(t=>t===w || (t.length>=4 && (t.startsWith(w)||w.startsWith(t))));
+  let scored=CATALOG.map(p=>{
+    let s=0;
+    if(wantCats.has(p.category)) s+=5;   // query names this category (handles plurals/synonyms)
+    [[p.concern,3],[p.skin_type,3],[p.category,2],[p.brand,2],[p.key_ingredients,1],[p.name,1]]
+      .forEach(([f,w])=>{ (f||"").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+        .forEach(word=>{ if(wordMatch(word)) s+=w; }); });
+    return {p,s};
+  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.p);
+  if(budget) scored=scored.filter(p=>p.price_inr<=budget);
+  return scored;
+}
+
+function buildRoutine(skin,budget){
+  const order=["cleanser","serum","moisturizer","sunscreen"];
+  const out=[];
+  order.forEach(cat=>{
+    const opts=CATALOG.filter(p=>p.category===cat && (p.skin_type===skin||p.skin_type==="all"))
+                      .sort((a,b)=>a.price_inr-b.price_inr);
+    if(opts.length) out.push(opts[0]);
+  });
+  // budget trim
+  if(budget){ let t=0; const kept=[]; for(const p of out){ if(t+p.price_inr<=budget){kept.push(p);t+=p.price_inr;} } return kept; }
+  return out;
+}
+
+// keyboard
+document.getElementById('input').addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+
+// ---- Make Nebula draggable (so it never blocks the cart total) ----
+// Press & drag to move it anywhere; a quick tap still opens/closes the chat.
+// Position is remembered across reloads. Works with mouse and touch.
+(function makeNebulaDraggable(){
+  const fab = document.getElementById('fab');
+  const POS_KEY = 'nebulaPos';
+  let dragging=false, moved=false, startX=0, startY=0, offX=0, offY=0;
+
+  function place(left, top){
+    const w=fab.offsetWidth, h=fab.offsetHeight, pad=8;
+    left=Math.max(pad, Math.min(window.innerWidth - w - pad, left));
+    top =Math.max(pad, Math.min(window.innerHeight - h - pad, top));
+    fab.style.left=left+'px'; fab.style.top=top+'px';
+    fab.style.right='auto'; fab.style.bottom='auto';
+  }
+  // restore saved position
+  try{ const p=JSON.parse(localStorage.getItem(POS_KEY)||'null'); if(p) place(p.left, p.top); }catch(e){}
+
+  fab.style.touchAction='none';  // stop the page scrolling while dragging on mobile
+  fab.addEventListener('pointerdown', e=>{
+    dragging=true; moved=false; startX=e.clientX; startY=e.clientY;
+    const r=fab.getBoundingClientRect(); offX=e.clientX-r.left; offY=e.clientY-r.top;
+    fab.setPointerCapture(e.pointerId);
+  });
+  fab.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    if(Math.abs(e.clientX-startX)>5 || Math.abs(e.clientY-startY)>5) moved=true;
+    if(moved) place(e.clientX-offX, e.clientY-offY);
+  });
+  fab.addEventListener('pointerup', e=>{
+    if(!dragging) return;
+    dragging=false;
+    try{ fab.releasePointerCapture(e.pointerId); }catch(_){}
+    if(moved){
+      const r=fab.getBoundingClientRect();
+      try{ localStorage.setItem(POS_KEY, JSON.stringify({left:r.left, top:r.top})); }catch(_){}
+    }else{
+      togglePanel();  // it was a tap, not a drag → open/close the chat
+    }
+  });
+})();
+</script>
