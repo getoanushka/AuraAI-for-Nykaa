@@ -136,8 +136,11 @@ demo.py                         CLI demo
   **same schema** with no code changes.
 - Product images on the storefront are pulled from brands' public Shopify CDNs (with an
   icon-tile fallback); the rest of the page is self-contained.
-- The simulated cart/checkout links out to Nykaa.com — it can't transfer a cart into
-  Nykaa's real cart (no public API), so it opens the bagged items in a Nykaa search.
+- **Why checkout opens a Nykaa *search*, not the cart:** a cart is private and tied to a
+  logged-in Nykaa session, and there's no public "add to cart by URL" (Nykaa also blocks
+  automation). A `?q=` search is the only reliable public entry point, so checkout sends
+  all bagged items to one Nykaa search. A real Nykaa-internal build would call their cart
+  API directly — same agent logic, only the final fulfilment call changes.
 - Eval cases needing content judgment are scored only in LIVE mode (with a key); budget
   and hallucination checks run offline too.
 - This is a prototype meant to demonstrate method, not a production system.
