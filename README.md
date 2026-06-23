@@ -1,6 +1,6 @@
-# 💄 AuraAI — Nykaa Beauty Advisor
+#  AuraAI — Nykaa Beauty Advisor
 
-**🔗 Live demo: https://auraai-for-nykaa.onrender.com**
+** Live demo: https://auraai-for-nykaa.onrender.com**
 *(Hosted on Render's free tier — the first load may take ~30–50s while the instance wakes up.)*
 
 A **Google Gemini–powered**, RAG-grounded conversational beauty advisor. It recommends
