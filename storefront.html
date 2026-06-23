@@ -66,23 +66,30 @@
 
   /* floating agent */
   .fab{position:fixed;right:22px;bottom:22px;z-index:50;width:74px;height:74px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.7);cursor:pointer;color:#fff;
+    border:1px solid rgba(255,150,200,.4);cursor:pointer;color:#fff;
     font-family:'Libre Franklin','Arial Black',Impact,sans-serif;font-weight:900;font-size:12px;
     text-transform:uppercase;letter-spacing:-.02em;line-height:1;
     display:flex;align-items:center;justify-content:center;text-align:center;
     overflow:hidden;isolation:isolate;
-    box-shadow:0 10px 28px rgba(224,33,138,.4);transition:transform .14s, box-shadow .2s}
-  /* slowly rotating pink swirl with just a soft blush highlight (no harsh white) */
+    box-shadow:0 10px 30px rgba(160,20,120,.5);transition:transform .14s, box-shadow .2s}
+  /* rich magenta + purple cosmic swirl, slowly rotating — no white wash */
   .fab::before{content:"";position:absolute;inset:-60%;z-index:0;
-    background:conic-gradient(from 0deg,#c81e7e,#e0218a,#ff5fa8,#f72585,#ff9ecb,#ffd0e6 50%,#ff79b8 56%,#c81e7e);
-    animation:nebulaSpin 16s linear infinite}
-  /* faint glassy sheen so it reads as a glossy orb (kept subtle to avoid harsh white) */
+    background:conic-gradient(from 0deg,#5b1450,#c81e7e,#ff2d8e,#b5179e,#e0218a,#ff5fa8,#7a1f63,#5b1450);
+    animation:nebulaSpin 18s linear infinite}
+  /* depth: faint glowing core fading to dark cosmic edges (a vignette, not a white sheen) */
   .fab::after{content:"";position:absolute;inset:0;z-index:1;border-radius:50%;
-    background:radial-gradient(circle at 38% 32%, rgba(255,255,255,.16), transparent 38%)}
-  .fab span{position:relative;z-index:2;text-shadow:0 1px 5px rgba(157,12,64,.6)}
-  .fab:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 16px 40px rgba(224,33,138,.55)}
+    background:radial-gradient(circle at 50% 42%, rgba(255,140,200,.22) 0%, transparent 34%, rgba(28,4,30,.45) 100%)}
+  /* "NEBULA" text with a light glint sweeping across it (shimmer) */
+  .fab span{position:relative;z-index:2;
+    background:linear-gradient(100deg,#ffc7e3 0%,#ffd9ec 38%,#ffffff 50%,#ffd9ec 62%,#ffc7e3 100%);
+    background-size:220% 100%;-webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    filter:drop-shadow(0 1px 2px rgba(40,5,35,.55));
+    animation:nebulaShimmer 3s linear infinite}
+  .fab:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 16px 42px rgba(181,23,158,.6)}
   @keyframes nebulaSpin{to{transform:rotate(360deg)}}
-  @media (prefers-reduced-motion: reduce){ .fab::before{animation:none} }
+  @keyframes nebulaShimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+  @media (prefers-reduced-motion: reduce){ .fab::before,.fab span{animation:none} }
   .panel{position:fixed;right:22px;bottom:94px;z-index:50;width:360px;max-width:92vw;height:520px;max-height:78vh;
     background:#fff;border-radius:18px;box-shadow:var(--shadow);display:none;flex-direction:column;overflow:hidden}
   .panel.open{display:flex}
@@ -361,14 +368,13 @@ function checkout(){
     + `<div class="l tot"><span>Total</span><span>${fmt(cartTotal())}</span></div>`;
   document.getElementById('modal').classList.add('open');
 }
-// Open ONE Nykaa search tab containing ALL bagged items at once (e.g.
-// "Dot & Key sunscreen Pilgrim serum") — Nykaa's search shows every match, and a
-// single pop-up isn't blocked the way multiple tabs are.
+// Open ONE Nykaa search tab with the FULL name of every bagged item. Nykaa's search
+// handles multiple product names and shows them all — the earlier bug was using
+// truncated terms (brand+category) instead of the complete names.
 function openOnNykaa(){
   const items = cartList();
   if(!items.length) return;
-  // one concise term per item (brand + category), de-duplicated
-  const terms = [...new Set(items.map(({p})=>`${p.brand} ${p.category}`))].join(" ");
+  const terms = items.map(({p})=>p.name).join(" ");
   const url = "https://www.nykaa.com/search/result/?q=" + encodeURIComponent(terms);
   const w = window.open(url, "_blank");
   if(w){ try{ w.opener=null; }catch(_){} }
