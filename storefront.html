@@ -145,6 +145,34 @@
     background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:13px;font-weight:600;
     box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:70}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* cycle-aware skin tracker */
+  .cycle{display:flex;gap:26px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--line);
+    border-radius:var(--r);padding:22px;margin-top:18px;box-shadow:var(--shadow)}
+  .cyc-ring-wrap{flex:none}
+  .cyc-ring{position:relative;width:208px;height:208px;border-radius:50%;background:conic-gradient(#ececec 0deg 360deg)}
+  .cyc-ring::after{content:"";position:absolute;inset:26px;background:#fff;border-radius:50%;box-shadow:inset 0 2px 12px rgba(0,0,0,.06)}
+  .cyc-hand{position:absolute;inset:0;transition:transform .6s cubic-bezier(.5,1.5,.5,1)}
+  .cyc-dot{position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;
+    background:#fff;border:4px solid var(--pink-deep);box-shadow:0 2px 8px rgba(0,0,0,.28)}
+  .cyc-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+  .cyc-day{font-size:12.5px;color:var(--muted);font-weight:600}
+  .cyc-phase{font-size:18px;font-weight:800;color:var(--pink-deep);max-width:118px;line-height:1.15}
+  .cyc-body{flex:1;min-width:240px}
+  .cyc-body h2{margin:0 0 4px;font-size:20px}
+  .cyc-sub{margin:0 0 14px;color:var(--muted);font-size:14px}
+  .cyc-inputs{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .cyc-inputs label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
+  .cyc-inputs input{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:var(--ink)}
+  .cyc-inputs input[type=number]{width:62px}
+  .cyc-inputs .row{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:400}
+  .cyc-info{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:13.5px;margin-bottom:14px;line-height:1.5}
+  .cyc-info b{color:var(--pink-deep)}
+  .cyc-cta{background:var(--pink);color:#fff;border:none;border-radius:999px;padding:11px 18px;font-weight:800;cursor:pointer;font-size:14px}
+  .cyc-cta:hover:not(:disabled){background:var(--pink-deep)}
+  .cyc-cta:disabled{opacity:.5;cursor:not-allowed}
+  .cyc-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:var(--muted)}
+  .cyc-legend span{display:flex;align-items:center;gap:5px}
+  .cyc-legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
 </style>
 
 <header>
@@ -159,6 +187,34 @@
        “sunscreen for oily skin under 500”, “add a niacinamide serum”, “build a daytime routine”.
        It fills your bag and walks you to checkout.</p>
   </div>
+  <!-- Cycle-aware skin phase tracker -->
+  <section class="cycle" id="cycle">
+    <div class="cyc-ring-wrap">
+      <div class="cyc-ring" id="cycRing">
+        <div class="cyc-hand" id="cycHand"><span class="cyc-dot"></span></div>
+        <div class="cyc-center">
+          <div class="cyc-day" id="cycDay">Day –</div>
+          <div class="cyc-phase" id="cycPhaseName">set your cycle</div>
+        </div>
+      </div>
+    </div>
+    <div class="cyc-body">
+      <h2>Your skin cycle</h2>
+      <p class="cyc-sub">Track your period and AuraAI reads your current phase — then suggests what your skin needs right now.</p>
+      <div class="cyc-inputs">
+        <label>Last period started<input type="date" id="cycStart"></label>
+        <label>Cycle length<span class="row"><input type="number" id="cycLen" value="28" min="20" max="40"> days</span></label>
+      </div>
+      <div class="cyc-info" id="cycInfo">Pick the date your last period started to see your current skin phase.</div>
+      <button class="cyc-cta" id="cycCta" disabled>Shop for my skin right now</button>
+      <div class="cyc-legend">
+        <span><i style="background:#e25563"></i>Menstrual</span>
+        <span><i style="background:#f5a3c7"></i>Follicular</span>
+        <span><i style="background:#ffc36b"></i>Ovulation</span>
+        <span><i style="background:#b07cc6"></i>Luteal</span>
+      </div>
+    </div>
+  </section>
   <div class="grid" id="grid"></div>
 </div>
 
@@ -637,5 +693,83 @@ document.getElementById('input').addEventListener('keydown',e=>{ if(e.key==='Ent
       togglePanel();  // it was a tap, not a drag → open/close the chat
     }
   });
+})();
+
+// ---- Cycle-aware skin phase tracker (Clue-style) ----
+(function cycleTracker(){
+  const PHASES = {
+    menstrual:{ name:"Menstrual", color:"#e25563",
+      skin:"Estrogen's at its lowest, so skin can feel <b>dry, dull and sensitive</b>. Keep it gentle and hydrated.",
+      query:"Build a gentle daytime routine for dry, sensitive skin — hydrating cleanser, soothing serum, rich moisturizer and a gentle sunscreen." },
+    follicular:{ name:"Follicular", color:"#f5a3c7",
+      skin:"Estrogen's rising — skin is <b>clear, bouncy and glowing</b>. Great time for actives like vitamin C.",
+      query:"Build a glow-boosting daytime routine for clear skin — gentle cleanser, vitamin C serum, exfoliating toner, light moisturizer and sunscreen." },
+    ovulation:{ name:"Ovulation", color:"#ffc36b",
+      skin:"Estrogen peaks — you're <b>glowing</b>, but oil starts creeping up. Keep it light and wear SPF.",
+      query:"Build a lightweight daytime routine — gentle cleanser, hydrating serum, oil-free gel moisturizer and a matte sunscreen." },
+    luteal:{ name:"Luteal", color:"#b07cc6",
+      skin:"Progesterone's high — expect <b>more oil, clogged pores and breakouts</b>. Time for oil control.",
+      query:"Build an oil-control daytime routine for oily, acne-prone skin — salicylic acid cleanser, niacinamide serum, oil-free moisturizer and a matte sunscreen." },
+  };
+  const startEl=document.getElementById('cycStart'), lenEl=document.getElementById('cycLen'),
+        ring=document.getElementById('cycRing'), hand=document.getElementById('cycHand'),
+        dot=hand.querySelector('.cyc-dot'),
+        dayEl=document.getElementById('cycDay'), phaseEl=document.getElementById('cycPhaseName'),
+        info=document.getElementById('cycInfo'), cta=document.getElementById('cycCta');
+  let currentQuery=null;
+
+  try{ const s=JSON.parse(localStorage.getItem('auraCycle')||'null'); if(s){ startEl.value=s.start; lenEl.value=s.len; } }catch(e){}
+
+  function compute(){
+    const start=startEl.value;
+    const len=Math.max(20, Math.min(40, parseInt(lenEl.value)||28));
+    if(!start) return null;
+    const startD=new Date(start+"T00:00:00"); const today=new Date(); today.setHours(0,0,0,0);
+    const diff=Math.floor((today-startD)/86400000);
+    if(isNaN(diff)) return null;
+    const day=((diff%len)+len)%len + 1;            // 1..len, repeating
+    const periodLen=5;
+    const ovDay=Math.max(12, len-14);              // ovulation ~14 days before next period
+    const ovStart=ovDay-1, ovEnd=ovDay+1;
+    let key;
+    if(day<=periodLen) key="menstrual";
+    else if(day<ovStart) key="follicular";
+    else if(day<=ovEnd) key="ovulation";
+    else key="luteal";
+    return {day,len,periodLen,ovStart,ovEnd,key};
+  }
+  const deg=(d,len)=>(d/len)*360;
+
+  function render(){
+    const c=compute();
+    if(!c){
+      ring.style.background="conic-gradient(#ececec 0deg 360deg)";
+      hand.style.transform="rotate(0deg)";
+      dayEl.textContent="Day –"; phaseEl.textContent="set your cycle"; phaseEl.style.color="";
+      info.innerHTML="Pick the date your last period started to see your current skin phase.";
+      cta.disabled=true; currentQuery=null; return;
+    }
+    const {day,len,periodLen,ovStart,ovEnd,key}=c, m=PHASES;
+    const b1=deg(periodLen,len), b2=deg(ovStart-1,len), b3=deg(ovEnd,len);
+    ring.style.background=`conic-gradient(${m.menstrual.color} 0deg ${b1}deg, ${m.follicular.color} ${b1}deg ${b2}deg, ${m.ovulation.color} ${b2}deg ${b3}deg, ${m.luteal.color} ${b3}deg 360deg)`;
+    hand.style.transform=`rotate(${deg(day-0.5,len)}deg)`;
+    const ph=m[key];
+    dot.style.borderColor=ph.color;
+    dayEl.textContent=`Day ${day} of ${len}`;
+    phaseEl.textContent=ph.name; phaseEl.style.color=ph.color;
+    info.innerHTML=`<b>${ph.name} phase.</b> ${ph.skin}`;
+    cta.disabled=false; currentQuery=ph.query;
+    try{ localStorage.setItem('auraCycle', JSON.stringify({start:startEl.value, len})); }catch(e){}
+  }
+
+  startEl.addEventListener('change', render);
+  lenEl.addEventListener('change', render);
+  lenEl.addEventListener('input', render);
+  cta.addEventListener('click', ()=>{
+    if(!currentQuery) return;
+    togglePanel(true);
+    const inp=document.getElementById('input'); inp.value=currentQuery; send();
+  });
+  render();
 })();
 </script>

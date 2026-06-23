@@ -161,6 +161,25 @@ def _validate(parsed, retrieved_rows, max_price=None):
     return (len(problems) == 0), problems
 
 
+ROUTINE_CATS = ["cleanser", "serum", "toner", "moisturizer", "sunscreen", "eye care"]
+
+
+def _diversify_for_routine(rows, per_cat=2):
+    """Spread retrieved rows across routine categories so a full routine
+    (cleanser -> serum -> moisturizer -> sunscreen) can be built, instead of the
+    model only seeing e.g. three cleansers. Falls back to the original rows if
+    there isn't enough category variety."""
+    by_cat = {}
+    for r in rows:
+        by_cat.setdefault(r["category"], []).append(r)
+    picked = []
+    for cat in ROUTINE_CATS:
+        picked += by_cat.get(cat, [])[:per_cat]
+    if len({r["category"] for r in picked}) < 3:
+        return rows
+    return picked
+
+
 def _rule_intent(query):
     """Lightweight intent detection used in MOCK mode (no API key)."""
     q = query.lower()
@@ -190,7 +209,9 @@ def advise(user_query, history="", max_price=None):
         if history and intent == "vague":  # a follow-up in context isn't vague
             intent = "recommend"
         rows, backend = retrieve((user_query + " " + history).strip(),
-                                 k=8, max_price=max_price)
+                                 k=(24 if intent == "routine" else 8), max_price=max_price)
+        if intent == "routine":
+            rows = _diversify_for_routine(rows)
         return {
             "answer": _mock_answer(rows, user_query, max_price, intent),
             "retrieval_backend": backend,
@@ -230,7 +251,9 @@ def advise(user_query, history="", max_price=None):
         parsed_q.get("concern"), parsed_q.get("skin_type"),
         parsed_q.get("category"), user_query, history,
     ]))
-    rows, backend = retrieve(enriched, k=8, max_price=eff_price)
+    rows, backend = retrieve(enriched, k=(24 if intent == "routine" else 8), max_price=eff_price)
+    if intent == "routine":
+        rows = _diversify_for_routine(rows)
     catalog = catalog_block(rows)
 
     # ---- 3 + 4. ROUTE to an intent-specific prompt, then GENERATE (JSON schema) ----
@@ -290,7 +313,12 @@ def _mock_answer(rows, user_query, max_price=None, intent="recommend"):
         }
 
     recs, total = [], 0.0
+    seen_cats = set()
+    limit = 4 if intent == "routine" else 3
     for r in rows:
+        # for a routine, give one product per step (cleanser/serum/moisturizer/sunscreen)
+        if intent == "routine" and r["category"] in seen_cats:
+            continue
         price = float(r["price_inr"])
         if max_price and total + price > max_price:
             continue
@@ -301,8 +329,9 @@ def _mock_answer(rows, user_query, max_price=None, intent="recommend"):
             "price_inr": price,
             "why": f"Matches your interest in {r['concern']}.",
         })
+        seen_cats.add(r["category"])
         total += price
-        if len(recs) >= 3:
+        if len(recs) >= limit:
             break
     return {
         "intro": "Here's a quick routine based on what you described (mock output).",

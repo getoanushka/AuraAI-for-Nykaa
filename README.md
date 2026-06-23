@@ -29,6 +29,8 @@ real cart actions and links straight out to Nykaa.com.
 - **Evaluation**: an accuracy / safety / consistency scorecard (`evals/`).
 - **An agentic storefront** (`storefront.html`): natural-language cart actions, real
   product images, and checkout that opens the bagged items on Nykaa.
+- **Cycle-aware skincare** — a Clue-style menstrual-cycle tracker that reads your current
+  phase and builds a routine matched to how your skin behaves in it.
 
 ## The prompt pipeline
 
@@ -62,6 +64,22 @@ against medical-sounding requests, and at checkout opens your items on Nykaa.com
   Gemini; your key stays on the server).
 - **Zero-setup mode:** open `storefront.html` directly — with no server it falls back to a
   transparent rule-based brain, so the page always works.
+
+## Cycle-aware skincare
+A standout feature: a **Clue-style circular menstrual-cycle tracker** on the storefront.
+Enter your last period date + cycle length (saved locally) and AuraAI reads your current
+phase, explains how your skin tends to behave in it, and — on one tap — builds a **full
+routine** matched to that phase:
+
+| Phase | Skin tendency | Routine focus |
+|---|---|---|
+| Menstrual | dry, dull, sensitive | gentle hydration |
+| Follicular | clear, glowing, resilient | actives / vitamin C |
+| Ovulation | glowing, oil rising | light hydration + SPF |
+| Luteal | oily, clogged, breakout-prone | oil control (salicylic / niacinamide) |
+
+The phase→skin→product mapping is grounded in real hormonal-skin science, and the "Shop
+for my skin right now" button runs through the same Gemini routine pipeline.
 
 ## Quickstart
 
