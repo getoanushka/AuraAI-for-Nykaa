@@ -1,11 +1,11 @@
-# 💄 Aura — Nykaa Beauty Advisor
+# 💄 AuraAI — Nykaa Beauty Advisor
 
 A **Google Gemini–powered**, RAG-grounded conversational beauty advisor. It recommends
 products from a grounded catalog, respects the shopper's budget, refuses to give medical
 advice, and returns clean structured output — wrapped in a **versioned prompt library**,
 an **evaluation harness**, and a **prompt iteration log**.
 
-It ships with **Aura**, a single-file storefront whose floating advisor **Nebula** takes
+It ships with **AuraAI**, a single-file storefront whose floating advisor **Nebula** takes
 real cart actions and links straight out to Nykaa.com.
 
 > Powered by **Google Gemini** (`gemini-2.5-flash-lite` by default). Set a
@@ -40,7 +40,7 @@ user query
   → GENERATE   Gemini → JSON schema      (constrained decoding; persona + CoT)
   → VALIDATE   anti-hallucination + budget checks, in code
   → CRITIQUE   feed problems back to the model to repair, if any
-  → render     demo.py / Streamlit / the Aura storefront
+  → render     demo.py / Streamlit / the AuraAI storefront
 ```
 
 ## Defense-in-depth against hallucination
@@ -53,7 +53,7 @@ user query
 
 The prompt is never the only safeguard.
 
-## The Aura storefront
+## The AuraAI storefront
 `storefront.html` is a self-contained mini "Nykaa" storefront with a draggable floating
 advisor, **Nebula**. Type what you want and it fills your bag, builds routines, guards
 against medical-sounding requests, and at checkout opens your items on Nykaa.com.
@@ -69,7 +69,7 @@ against medical-sounding requests, and at checkout opens your items on Nykaa.com
 pip install -r requirements.txt          # core: google-genai (optional: Chroma for vector RAG)
 export GEMINI_API_KEY=...                # free key: https://aistudio.google.com/apikey
 
-python server.py                         # the Aura storefront → http://localhost:8000
+python server.py                         # the AuraAI storefront → http://localhost:8000
 python demo.py                           # CLI demo of the advisor pipeline
 streamlit run app/ui.py                  # plain chat UI
 python -m evals.run_evals                # accuracy / safety / consistency scorecard
@@ -95,7 +95,7 @@ app/advisor.py                  agent pipeline: parse → retrieve → route →
 app/retrieval.py                RAG: vector (Chroma) + lexical fallback
 app/ui.py                       Streamlit chat UI
 server.py                       serves the storefront + Gemini-backed /api/advise endpoint
-storefront.html                 the Aura storefront with the Nebula advisor (single file)
+storefront.html                 the AuraAI storefront with the Nebula advisor (single file)
 evals/cases.py                  test suite (accuracy / safety / consistency)
 evals/run_evals.py              eval runner + scorecard
 test_pipeline.py                guided tour / smoke test of the pipeline
