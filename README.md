@@ -1,107 +1,122 @@
-# 💄 Nykaa Beauty Advisor — a RAG-grounded AI shopping agent
+# 💄 Aura — Nykaa Beauty Advisor
 
-A prompt-engineering project built to mirror real work on Nykaa's AI & Innovation
-team: a conversational beauty advisor that recommends products from a grounded
-catalog, respects the shopper's budget, refuses to give medical advice, and returns
-clean structured output — wrapped in a **versioned prompt library**, an
-**evaluation harness**, and a **prompt iteration log**.
+A **Google Gemini–powered**, RAG-grounded conversational beauty advisor. It recommends
+products from a grounded catalog, respects the shopper's budget, refuses to give medical
+advice, and returns clean structured output — wrapped in a **versioned prompt library**,
+an **evaluation harness**, and a **prompt iteration log**.
 
-> The working chatbot is the demo. The prompt templates, evals, and iteration log are
-> the deliverable — they're the evidence of *how* I design, debug, and ship prompts.
+It ships with **Aura**, a single-file storefront whose floating advisor **Nebula** takes
+real cart actions and links straight out to Nykaa.com.
+
+> Powered by **Google Gemini** (`gemini-2.5-flash-lite` by default). Set a
+> `GEMINI_API_KEY` to run the real model; without one it falls back to a deterministic
+> mock so the project still runs end-to-end.
 
 ---
 
-## Why this exists
+## What it demonstrates
 
-Online beauty shopping is advice-driven, but there's no advisor on the other side of
-the screen. This agent is that advisor. Every hard part of it is a prompt-engineering
-problem: persona design, anti-hallucination grounding, structured output, budget
-reasoning, and safety boundaries.
+- **Prompt engineering as a discipline** — a versioned, annotated prompt library
+  (`prompts/templates.py`) using **zero-shot** persona priming, **few-shot** intent
+  parsing, **chain-of-thought** budget/routine reasoning, **prompt routing**, and a
+  **self-critique** reflection pass.
+- **A real agent pipeline** (`app/advisor.py`): parse → retrieve → route → generate →
+  validate → self-correct.
+- **RAG** (`app/retrieval.py`): semantic retrieval via Chroma + sentence-transformers,
+  with a dependency-free lexical fallback.
+- **Structured output**: Gemini is constrained to a JSON schema (`response_schema`), so
+  the model is *forced* to emit valid JSON — not coaxed by instructions alone.
+- **Evaluation**: an accuracy / safety / consistency scorecard (`evals/`).
+- **An agentic storefront** (`storefront.html`): natural-language cart actions, real
+  product images, and checkout that opens the bagged items on Nykaa.
 
-## How it maps to the Prompt Engineer JD
-
-| JD asks for | Where it lives in this repo |
-|---|---|
-| Design & optimize prompts for LLMs | `prompts/templates.py` (versioned, annotated) |
-| Prompt experimentation, evaluation, benchmarking | `evals/run_evals.py` + `evals/cases.py` |
-| Reusable prompt templates and libraries | `prompts/templates.py` |
-| Evaluation frameworks: accuracy, safety, consistency | three eval axes, scorecard output |
-| Zero-shot / few-shot / chain-of-thought | each technique used and labeled in templates |
-| Build AI agents, workflows, automation | `app/advisor.py` (retrieve → prompt → validate) |
-| RAG, embeddings, vector databases | `app/retrieval.py` (Chroma + sentence-transformers) |
-| Document best practices & methodologies | `docs/BEST_PRACTICES.md`, `docs/PROMPT_ITERATION_LOG.md` |
-| Python; OpenAI/Anthropic/Gemini | Python + Google Gemini |
-
-## Architecture
+## The prompt pipeline
 
 ```
 user query
-  → retrieval.py     retrieve grounded catalog rows (vector RAG, lexical fallback)
-  → templates.py     build prompt: system persona + CoT recommendation + JSON schema
-  → advisor.py       call Gemini → tolerant JSON parse → validate (anti-hallucination,
-                     budget consistency)
-  → ui.py / demo.py  render structured recommendation
+  → PARSE      intent + filters         (rule-based router; few-shot LLM parser optional)
+  → RETRIEVE   grounded catalog rows     (vector RAG, lexical fallback)
+  → ROUTE      intent-specific prompt    (recommend / routine / safety / vague)
+  → GENERATE   Gemini → JSON schema      (constrained decoding; persona + CoT)
+  → VALIDATE   anti-hallucination + budget checks, in code
+  → CRITIQUE   feed problems back to the model to repair, if any
+  → render     demo.py / Streamlit / the Aura storefront
 ```
-
-Three prompt-engineering techniques, each used where it fits:
-- **Zero-shot** role priming for the system persona.
-- **Chain-of-thought** (internal) for budget math and routine ordering.
-- **Few-shot** for the query→filters parser.
 
 ## Defense-in-depth against hallucination
 1. **Prompt rule:** recommend only from the injected `<catalog>`.
 2. **RAG grounding:** only relevant catalog rows are shown to the model.
-3. **Code validator:** every returned `product_id` is checked against the real
-   catalog; the budget total is re-summed. The prompt is never the only safeguard.
+3. **Schema-constrained output:** the response must match the JSON schema.
+4. **Code validator:** every returned `product_id` is checked against the real catalog
+   and the budget total is re-summed.
+5. **Self-critique:** when the validator flags a problem, the model is asked to fix it.
+
+The prompt is never the only safeguard.
+
+## The Aura storefront
+`storefront.html` is a self-contained mini "Nykaa" storefront with a draggable floating
+advisor, **Nebula**. Type what you want and it fills your bag, builds routines, guards
+against medical-sounding requests, and at checkout opens your items on Nykaa.com.
+
+- **Real-AI mode:** run `server.py` (serves the page + a `/api/advise` endpoint backed by
+  Gemini; your key stays on the server).
+- **Zero-setup mode:** open `storefront.html` directly — with no server it falls back to a
+  transparent rule-based brain, so the page always works.
 
 ## Quickstart
 
 ```bash
-pip install -r requirements.txt          # optional libs enable vector RAG
-export GEMINI_API_KEY=...                  # free key from https://aistudio.google.com/apikey
-                                          # without this, runs in deterministic MOCK mode
+pip install -r requirements.txt          # core: google-genai (optional: Chroma for vector RAG)
+export GEMINI_API_KEY=...                # free key: https://aistudio.google.com/apikey
 
-python demo.py                            # CLI demo
-streamlit run app/ui.py                   # chat UI
-python -m evals.run_evals                 # scorecard across accuracy/safety/consistency
+python server.py                         # the Aura storefront → http://localhost:8000
+python demo.py                           # CLI demo of the advisor pipeline
+streamlit run app/ui.py                  # plain chat UI
+python -m evals.run_evals                # accuracy / safety / consistency scorecard
+python test_pipeline.py                  # guided tour of the pipeline (intent/routing/critique)
 ```
 
-The project runs **with no API key and no optional libraries** — it falls back to a
-deterministic mock model and a dependency-free lexical retriever — so a reviewer can
-clone and run it instantly. Add the key (and optionally Chroma) to see real Gemini
-output and semantic retrieval.
+**No key? Still runs.** Without `GEMINI_API_KEY` the advisor returns deterministic mock
+output and the retriever uses the lexical fallback, so you can clone and run instantly.
+Add the key to use the real Gemini pipeline; add Chroma + sentence-transformers for
+semantic retrieval.
 
-## What to read first (for a reviewer)
-1. `docs/PROMPT_ITERATION_LOG.md` — failure → cause → fix, per prompt. The story of
-   the engineering.
-2. `prompts/templates.py` — the annotated prompt library.
-3. `evals/run_evals.py` — how quality is measured.
+## What to read first
+1. `docs/PROMPT_ITERATION_LOG.md` — failure → cause → fix, per prompt. The story of the
+   engineering.
+2. `prompts/templates.py` — the annotated, versioned prompt library.
+3. `app/advisor.py` — the pipeline that ties it together.
+4. `evals/run_evals.py` — how quality is measured.
 
 ## Repo layout
 ```
 prompts/templates.py            versioned, annotated prompt library
+app/advisor.py                  agent pipeline: parse → retrieve → route → generate → validate → critique
 app/retrieval.py                RAG: vector (Chroma) + lexical fallback
-app/advisor.py                  agent orchestration + JSON parsing + validation
 app/ui.py                       Streamlit chat UI
+server.py                       serves the storefront + Gemini-backed /api/advise endpoint
+storefront.html                 the Aura storefront with the Nebula advisor (single file)
 evals/cases.py                  test suite (accuracy / safety / consistency)
 evals/run_evals.py              eval runner + scorecard
-data/products.csv               grounded product catalog (35 SKUs)
+test_pipeline.py                guided tour / smoke test of the pipeline
+data/products.csv               grounded product catalog (145 SKUs)
 docs/PROMPT_ITERATION_LOG.md    failure→fix history (the key artifact)
 docs/BEST_PRACTICES.md          methodology playbook
 demo.py                         CLI demo
 ```
 
 ## Notes & data provenance
-- The catalog (`data/products.csv`) has **145 products across 14 categories**. The
-  first 25 are **real products verified from public nykaa.com listings** (real names,
-  brands, prices, ingredients — `source=verified`). The remaining ~120 are
-  **representative demo data** (`source=representative`): real Indian beauty brands
-  (The Derma Co, Mamaearth, Plum, Pilgrim, Aqualogica, Lakmé, Sugar, etc.) with
-  realistic product types and plausible prices, generated by `build_catalog.py`.
-  Prices are illustrative, not live-verified. Production data would load from Nykaa's
-  live catalog via the **same schema** with no code changes.
-- The larger catalog makes the RAG/retrieval layer meaningful: retrieving the 8 most
-  relevant items from 145 is a real demonstration of grounding at a realistic scale.
-- Eval cases needing content judgment are scored only in LIVE mode (with an API key);
-  budget and hallucination checks run offline too.
-- This is a one-day prototype meant to demonstrate method, not a production system.
+- The catalog (`data/products.csv`) has **145 products across 14 categories**. The first
+  25 are **real products verified from public nykaa.com listings** (`source=verified`).
+  The remaining ~120 are **representative demo data** (`source=representative`): real
+  Indian beauty brands (The Derma Co, Mamaearth, Plum, Pilgrim, Aqualogica, Lakmé, Sugar,
+  etc.) with realistic product types and plausible prices, generated by `build_catalog.py`.
+  Prices are illustrative. Production data would load from Nykaa's live catalog via the
+  **same schema** with no code changes.
+- Product images on the storefront are pulled from brands' public Shopify CDNs (with an
+  icon-tile fallback); the rest of the page is self-contained.
+- The simulated cart/checkout links out to Nykaa.com — it can't transfer a cart into
+  Nykaa's real cart (no public API), so it opens the bagged items in a Nykaa search.
+- Eval cases needing content judgment are scored only in LIVE mode (with a key); budget
+  and hallucination checks run offline too.
+- This is a prototype meant to demonstrate method, not a production system.
