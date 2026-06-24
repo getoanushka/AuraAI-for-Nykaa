@@ -512,7 +512,7 @@ async function handle(text){
     const data = await r.json();
     typing.remove();
     if(!data.answer) throw new Error(data.error||"no answer");
-    applyAdvice(data.answer, text);
+    applyAdvice(data.answer, text, budget);
   }catch(e){
     typing.remove();
     // Don't hide failures — tell the user we dropped to the basic offline brain.
@@ -522,7 +522,7 @@ async function handle(text){
 }
 
 // Turn the advisor's structured JSON into cart actions + chat, and remember the turn.
-function applyAdvice(ans, userText){
+function applyAdvice(ans, userText, budget){
   const recs = (ans.recommendations||[]).filter(r=>CATALOG.find(x=>x.product_id===r.product_id));
   if(!recs.length){
     let msg = ans.intro || "";
@@ -539,7 +539,7 @@ function applyAdvice(ans, userText){
     recs.map(r=>`• ${r.name} — ${fmt(r.price_inr)}${r.why?" — "+r.why:""}`).join("\n") +
     `\n\nTotal: ${fmt(ans.total_inr || recs.reduce((s,r)=>s+r.price_inr,0))}.`;
   if(ans.note) msg += "\n\nℹ️ "+ans.note;
-  if(ans.within_budget===false) msg += "\n\n⚠️ This is over the budget you mentioned.";
+  if(budget && ans.within_budget===false) msg += "\n\n⚠️ This is over the ₹"+budget+" budget you mentioned.";
   agentSay(msg);
   if(userText){ remember("User", userText); remember("Nebula", (ans.intro||"") + " Suggested: " + recs.map(r=>r.name).join(", ")); }
   toggleCart(true);
@@ -719,8 +719,7 @@ document.getElementById('input').addEventListener('keydown',e=>{ if(e.key==='Ent
         dayEl=document.getElementById('cycDay'), phaseEl=document.getElementById('cycPhaseName'),
         info=document.getElementById('cycInfo'), cta=document.getElementById('cycCta');
   let currentQuery=null;
-
-  try{ const s=JSON.parse(localStorage.getItem('auraCycle')||'null'); if(s){ startEl.value=s.start; lenEl.value=s.len; } }catch(e){}
+  // Cycle is session-only: starts empty on every page load (not persisted).
 
   function compute(){
     const start=startEl.value;
@@ -769,10 +768,10 @@ document.getElementById('input').addEventListener('keydown',e=>{ if(e.key==='Ent
       (toPeriod>0 ? ` · period in ~${toPeriod} day${toPeriod!=1?'s':''}` : ` · you're on your period now`);
     info.innerHTML=`<b>${ph.name} phase.</b> ${ph.skin}<br><span class="cyc-predict">${predict}</span>`;
     cta.disabled=false; currentQuery=ph.query;
-    try{ localStorage.setItem('auraCycle', JSON.stringify({start:startEl.value, len})); }catch(e){}
   }
 
   startEl.addEventListener('change', render);
+  startEl.addEventListener('input', render);   // save a new date immediately, not just on blur
   lenEl.addEventListener('change', render);
   lenEl.addEventListener('input', render);
   cta.addEventListener('click', ()=>{
