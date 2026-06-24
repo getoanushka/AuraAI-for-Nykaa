@@ -173,6 +173,8 @@
   .cyc-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:var(--muted)}
   .cyc-legend span{display:flex;align-items:center;gap:5px}
   .cyc-legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .cyc-predict{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--muted)}
+  .cyc-predict b{color:var(--pink-deep)}
 </style>
 
 <header>
@@ -757,7 +759,15 @@ document.getElementById('input').addEventListener('keydown',e=>{ if(e.key==='Ent
     dot.style.borderColor=ph.color;
     dayEl.textContent=`Day ${day} of ${len}`;
     phaseEl.textContent=ph.name; phaseEl.style.color=ph.color;
-    info.innerHTML=`<b>${ph.name} phase.</b> ${ph.skin}`;
+    // predictions: days until next phase + next period
+    const starts=[[1,'Menstrual'],[periodLen+1,'Follicular'],[ovStart,'Ovulation'],[ovEnd+1,'Luteal']];
+    let nextStart=len+1, nextName='Menstrual';
+    for(const [s,n] of starts){ if(s>day){ nextStart=s; nextName=n; break; } }
+    const toNext=nextStart-day;
+    const toPeriod = day<=periodLen ? 0 : (len-day+1);
+    const predict = `Next: <b>${nextName}</b> in ${toNext} day${toNext!=1?'s':''}` +
+      (toPeriod>0 ? ` · period in ~${toPeriod} day${toPeriod!=1?'s':''}` : ` · you're on your period now`);
+    info.innerHTML=`<b>${ph.name} phase.</b> ${ph.skin}<br><span class="cyc-predict">${predict}</span>`;
     cta.disabled=false; currentQuery=ph.query;
     try{ localStorage.setItem('auraCycle', JSON.stringify({start:startEl.value, len})); }catch(e){}
   }
