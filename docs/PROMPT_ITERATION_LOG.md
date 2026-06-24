@@ -72,6 +72,21 @@ Format per entry: **what I observed → why it happened → what I changed → r
   Lesson: constrain output at the decoding layer when the platform supports it, and
   show — don't just tell — the format.
 
+### v5 → v6  (the "chain-of-thought" was nominal, not real)
+- **Observed:** The prompt said "think step by step" but also "do NOT show your reasoning,
+  return ONLY JSON" — and `thinking_budget=0` disabled native thinking. So the model had
+  **no space to actually reason**; it emitted final JSON directly. Budget/ordering
+  correctness was really being caught by the code validator, not by reasoning.
+- **Why:** You can't claim chain-of-thought while forbidding the model any place to do it.
+  Reasoning has to live *somewhere* in the generation.
+- **Change:** Added a **`reasoning` field as the FIRST property** of the response schema.
+  Because generation is autoregressive, the model writes its step-by-step working
+  (skin type → matches → budget math → order) **before** the recommendations, so the
+  answer is genuinely conditioned on it. The field is then **stripped in code** before
+  the response reaches the UI (kept as metadata for transparency).
+- **Result:** Real, inspectable chain-of-thought with clean user-facing output. Lesson:
+  with structured output, *field order is a reasoning lever* — put the thinking first.
+
 ---
 
 ## Query-Parser / Intent Prompt

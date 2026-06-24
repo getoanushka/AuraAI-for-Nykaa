@@ -69,7 +69,8 @@ You speak in clear, simple English with light Indian context where natural \
 #      shape and the "why" tone far more reliably than instructions alone. The JSON
 #      shape is ALSO enforced at the API layer via response_schema (constrained
 #      decoding) — the prompt and the schema reinforce each other.
-# VERSION: v5  (v4 was zero-shot CoT; v5 adds the one-shot example + intent routing)
+# VERSION: v6  (v5 added one-shot + routing; v6 makes chain-of-thought REAL — a
+#               `reasoning` field generated BEFORE the answer, then stripped before display)
 # ---------------------------------------------------------------------------
 RECOMMENDATION_PROMPT = """<catalog>
 {catalog}
@@ -79,16 +80,19 @@ User request: "{user_query}"
 {conversation_context}
 {intent_guidance}
 
-Think step by step internally before answering:
-1. Identify the user's skin type, concern(s), and budget.
-2. From the catalog ONLY, pick the products that best match. Prefer products whose \
-'concern' or 'skin_type' aligns with the user.
-3. Add up prices. Confirm the total is within budget; if not, drop the least \
-essential item.
-4. For a routine, order steps logically (cleanser -> treatment/serum -> \
-moisturizer -> sunscreen for daytime).
+Return ONLY a JSON object. Fill the "reasoning" field FIRST and actually think there,
+step by step, before committing to the answer:
+1. the user's skin type, concern(s), and budget;
+2. which catalog products best match (prefer aligned 'concern' / 'skin_type');
+3. add up the prices and check the total is within budget — drop the least essential
+   item if it's over;
+4. for a routine, the logical step order (cleanser -> serum/treatment -> moisturizer
+   -> sunscreen for daytime).
+Then fill the remaining fields based on that reasoning (the reasoning is internal —
+it will not be shown to the user).
 
-Do NOT show your reasoning. Return ONLY a JSON object with these fields:
+Fields, in order:
+  reasoning            your step-by-step working (skin type, matches, budget math, order)
   intro                a warm one-sentence summary
   recommendations[]    each: step, product_id (from catalog), name (from catalog),
                        price_inr (number), why (one short sentence)
@@ -99,7 +103,9 @@ Do NOT show your reasoning. Return ONLY a JSON object with these fields:
 
 Worked example
 User request: "vitamin c serum for dullness under 700"
-{{"intro": "A brightening pick to tackle dullness, well within your budget.",
+{{"reasoning": "Wants a vitamin C serum for dullness, budget ₹700. P004 is a 16% vitamin C \
+serum targeting dullness, suits all skin types, priced ₹699 — within budget, so one item is enough.",
+  "intro": "A brightening pick to tackle dullness, well within your budget.",
   "recommendations": [{{"step": "Serum", "product_id": "P004",
     "name": "Minimalist 16% Vitamin C Face Serum With Vitamin E & Ferulic Acid",
     "price_inr": 699, "why": "Vitamin C targets dullness and suits all skin types."}}],

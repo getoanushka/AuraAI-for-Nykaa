@@ -60,6 +60,10 @@ try:
         why: str
 
     class Answer(BaseModel):
+        # `reasoning` is FIRST on purpose: the model generates it before the rest, so
+        # the recommendations are conditioned on real step-by-step thinking (CoT).
+        # It is stripped from the response before it reaches the UI.
+        reasoning: str
         intro: str
         recommendations: list[Recommendation]
         total_inr: float
@@ -101,7 +105,7 @@ def _generate(client, prompt, system_instruction, schema):
 
     config = types.GenerateContentConfig(
         system_instruction=system_instruction,
-        max_output_tokens=1024,
+        max_output_tokens=1536,  # room for the reasoning field + the full answer JSON
         temperature=0,  # determinism so the consistency eval is meaningful
         # gemini-2.5-* "thinks" by default, which can silently eat the output
         # token budget; our chain-of-thought is prompt-level, so turn it off.
@@ -284,6 +288,10 @@ def advise(user_query, history="", max_price=None):
         except Exception:
             pass  # keep the original answer; code-level problems are still reported
 
+    # Strip the chain-of-thought before it reaches the UI; keep it as metadata for
+    # transparency/debugging (the model reasoned in it before writing the answer).
+    reasoning = answer.pop("reasoning", "") if isinstance(answer, dict) else ""
+
     return {
         "answer": answer,
         "retrieval_backend": backend,
@@ -291,6 +299,7 @@ def advise(user_query, history="", max_price=None):
         "problems": problems,
         "intent": intent,
         "self_critiqued": self_critiqued,
+        "reasoning": reasoning,
     }
 
 
