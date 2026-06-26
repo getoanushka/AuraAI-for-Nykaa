@@ -1,15 +1,16 @@
-#  AuraAI — Nykaa Beauty Advisor
+# AuraAI — Nykaa Beauty Advisor
 
  Live demo: https://auraai-for-nykaa.onrender.com
 *(Hosted on Render's free tier — the first load may take ~30–50s while the instance wakes up.)*
 
-A **Google Gemini–powered**, RAG-grounded conversational beauty advisor. It recommends
-products from a grounded catalog, respects the shopper's budget, refuses to give medical
-advice, and returns clean structured output — wrapped in a **versioned prompt library**,
-an **evaluation harness**, and a **prompt iteration log**.
+Meet **Nebula** — a **Google Gemini–powered** conversational beauty advisor. Chat with
+Nebula in plain language and it recommends products from a grounded catalog, respects your
+budget, refuses to give medical advice, and returns clean structured output the app turns
+into cart actions. Nebula lives inside **AuraAI**, a single-file Nykaa-style storefront,
+where it builds routines, guards against medical-sounding requests, and links out to Nykaa.com.
 
-It ships with **AuraAI**, a single-file storefront whose floating advisor **Nebula** takes
-real cart actions and links straight out to Nykaa.com.
+The engineering focus is everything *behind* Nebula: a **versioned prompt library**, a
+**RAG pipeline**, an **evaluation + red-team harness**, and a **prompt iteration log**.
 
 > Powered by **Google Gemini** (`gemini-2.5-flash-lite` by default). Set a
 > `GEMINI_API_KEY` to run the real model; without one it falls back to a deterministic
@@ -23,7 +24,7 @@ real cart actions and links straight out to Nykaa.com.
   (`prompts/templates.py`) using **zero-shot** persona priming, **few-shot** intent
   parsing, real **chain-of-thought** (a reasoning field generated before the answer, then
   stripped), **prompt routing**, and a **self-critique** reflection pass.
-- **A real agent pipeline** (`app/advisor.py`): parse → retrieve → route → generate →
+- **Nebula's agent pipeline** (`app/advisor.py`): parse → retrieve → route → generate →
   validate → self-correct.
 - **RAG** (`app/retrieval.py`): the **lexical retriever** (dependency-free, what runs and is
   tested) plus an *implemented* semantic vector path (Chroma + sentence-transformers) as a
