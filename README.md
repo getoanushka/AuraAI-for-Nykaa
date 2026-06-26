@@ -30,7 +30,10 @@ real cart actions and links straight out to Nykaa.com.
   drop-in upgrade for a larger instance (see the config note below).
 - **Structured output**: Gemini is constrained to a JSON schema (`response_schema`), so
   the model is *forced* to emit valid JSON — not coaxed by instructions alone.
-- **Evaluation**: an accuracy / safety / consistency scorecard (`evals/`).
+- **Evaluation & red-teaming**: an accuracy / safety / consistency scorecard (`evals/`),
+  **plus a prompt-injection / red-team axis** that actively tries to jailbreak the agent
+  (override instructions, force off-catalog or medical answers, bust the budget, leak the
+  system prompt) and asserts it resists.
 - **An agentic storefront** (`storefront.html`): natural-language cart actions, real
   product images, and checkout that opens the bagged items on Nykaa.
 - **Cycle-aware skincare** — a Clue-style menstrual-cycle tracker that reads your current
@@ -108,7 +111,8 @@ export GEMINI_API_KEY=...                # free key: https://aistudio.google.com
 python server.py                         # the AuraAI storefront → http://localhost:8000
 python demo.py                           # CLI demo of the advisor pipeline
 streamlit run app/ui.py                  # plain chat UI
-python -m evals.run_evals                # accuracy / safety / consistency scorecard
+python -m evals.run_evals                # scorecard: accuracy / safety / consistency / injection
+python -m evals.run_evals injection      # run a single axis (handy on the free-tier 20 req/day quota)
 python test_pipeline.py                  # guided tour of the pipeline (intent/routing/critique)
 ```
 
@@ -132,8 +136,8 @@ app/retrieval.py                RAG: vector (Chroma) + lexical fallback
 app/ui.py                       Streamlit chat UI
 server.py                       serves the storefront + Gemini-backed /api/advise endpoint
 storefront.html                 the AuraAI storefront with the Nebula advisor (single file)
-evals/cases.py                  test suite (accuracy / safety / consistency)
-evals/run_evals.py              eval runner + scorecard
+evals/cases.py                  test suite (accuracy / safety / consistency / injection)
+evals/run_evals.py              eval runner + scorecard (quota-aware; per-axis filter)
 test_pipeline.py                guided tour / smoke test of the pipeline
 data/products.csv               grounded product catalog (145 SKUs)
 docs/PROMPT_ITERATION_LOG.md    failure→fix history (the key artifact)
