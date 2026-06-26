@@ -35,10 +35,12 @@ from prompts.templates import (
 MODEL = "gemini-2.5-flash-lite"  # higher free-tier quota than -flash; swap to
 #                                  gemini-2.5-flash / -pro for higher quality
 
-# The few-shot LLM parser is an extra Gemini call per query. On the tight free-tier
-# quota we default to the fast rule-based router and only use the LLM parser when
-# USE_LLM_PARSER=1 is set. (The parser prompt is still part of the library / docs.)
-USE_LLM_PARSER = bool(os.environ.get("USE_LLM_PARSER"))
+# Intent + filter extraction uses the few-shot LLM parser by DEFAULT (it's the
+# showcased technique and its extracted filters sharpen retrieval). It costs one extra
+# Gemini call per query, so set USE_LLM_PARSER=0 to fall back to the lightweight
+# rule-based router when the free-tier quota is tight. Either way the rule-based router
+# is the graceful fallback if the parser call fails.
+USE_LLM_PARSER = os.environ.get("USE_LLM_PARSER", "1").lower() not in ("0", "false", "no", "")
 
 PARSER_SYSTEM = ("You are a precise parser that turns beauty-shopping requests into "
                  "structured JSON. Follow the examples exactly.")

@@ -21,12 +21,13 @@ real cart actions and links straight out to Nykaa.com.
 
 - **Prompt engineering as a discipline** — a versioned, annotated prompt library
   (`prompts/templates.py`) using **zero-shot** persona priming, **few-shot** intent
-  parsing, **chain-of-thought** budget/routine reasoning, **prompt routing**, and a
-  **self-critique** reflection pass.
+  parsing, real **chain-of-thought** (a reasoning field generated before the answer, then
+  stripped), **prompt routing**, and a **self-critique** reflection pass.
 - **A real agent pipeline** (`app/advisor.py`): parse → retrieve → route → generate →
   validate → self-correct.
-- **RAG** (`app/retrieval.py`): semantic retrieval via Chroma + sentence-transformers,
-  with a dependency-free lexical fallback.
+- **RAG** (`app/retrieval.py`): the **lexical retriever** (dependency-free, what runs and is
+  tested) plus an *implemented* semantic vector path (Chroma + sentence-transformers) as a
+  drop-in upgrade for a larger instance (see the config note below).
 - **Structured output**: Gemini is constrained to a JSON schema (`response_schema`), so
   the model is *forced* to emit valid JSON — not coaxed by instructions alone.
 - **Evaluation**: an accuracy / safety / consistency scorecard (`evals/`).
@@ -39,14 +40,28 @@ real cart actions and links straight out to Nykaa.com.
 
 ```
 user query
-  → PARSE      intent + filters         (rule-based router; few-shot LLM parser optional)
-  → RETRIEVE   grounded catalog rows     (vector RAG, lexical fallback)
+  → PARSE      intent + filters         (few-shot LLM parser; rule-based fallback)
+  → RETRIEVE   grounded catalog rows     (lexical by default; vector RAG with optional deps)
   → ROUTE      intent-specific prompt    (recommend / routine / safety / vague)
-  → GENERATE   Gemini → JSON schema      (constrained decoding; persona + CoT)
+  → GENERATE   Gemini → JSON schema      (constrained decoding; reasoning-first chain-of-thought)
   → VALIDATE   anti-hallucination + budget checks, in code
   → CRITIQUE   feed problems back to the model to repair, if any
   → render     demo.py / Streamlit / the AuraAI storefront
 ```
+
+### What runs where (honest config note)
+The same code supports a full and a lightweight path; the live free-tier deploy runs the
+lightweight one **by design**, not by omission:
+- **Intent parser:** the few-shot LLM parser is **on by default**; set `USE_LLM_PARSER=0` to
+  use the rule-based router (one fewer Gemini call) when the free-tier quota is tight. The
+  rule-based router is also the automatic fallback if a parser call fails.
+- **Retrieval:** a vector-RAG path (Chroma + sentence-transformers embeddings) is
+  *implemented* in `app/retrieval.py`, but the **dependency-free lexical retriever is what
+  actually runs and is tested** everywhere — including the free-tier deploy (Chroma + PyTorch
+  don't fit Render's 512 MB). The vector path is a drop-in upgrade (same interface) for a
+  larger instance, not something this deployment exercises. A deliberate cost/infra tradeoff.
+- **Chain-of-thought:** real — the model fills a `reasoning` field *before* the answer
+  (autoregressive conditioning), which is then stripped before display.
 
 ## Defense-in-depth against hallucination
 1. **Prompt rule:** recommend only from the injected `<catalog>`.
