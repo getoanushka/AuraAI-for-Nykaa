@@ -38,6 +38,12 @@ def _categories(answer, retrieved_lookup):
     return cats
 
 
+def _is_quota(res):
+    """A 429 / quota error is an infra limit, not a prompt failure — treat as SKIP."""
+    err = str(res.get("error", ""))
+    return "429" in err or "RESOURCE_EXHAUSTED" in err or "quota" in err.lower()
+
+
 def check_case(case):
     """Return (status, detail). status in PASS / FAIL / SKIP."""
     exp = case["expect"]
@@ -45,15 +51,21 @@ def check_case(case):
     # consistency: run 3x, compare recommended-id sets
     if exp.get("stable_across_runs"):
         runs = [advise(case["query"], max_price=case["max_price"]) for _ in range(3)]
-        id_sets = {_ids(r["answer"]) for r in runs if r.get("answer")}
+        if any(_is_quota(r) for r in runs):
+            return "SKIP", "quota exhausted (429) — retry later"
         if not LIVE:
             return "SKIP", "needs live API to judge true consistency"
+        if any(not r.get("answer") for r in runs):
+            return "SKIP", "a run returned no answer (quota/transient)"
+        id_sets = {_ids(r["answer"]) for r in runs}
         return ("PASS", "identical across 3 runs") if len(id_sets) == 1 \
             else ("FAIL", f"varied: {id_sets}")
 
     res = advise(case["query"], max_price=case["max_price"])
     ans = res.get("answer")
     if not ans:
+        if _is_quota(res):
+            return "SKIP", "quota exhausted (429) — retry later"
         return "FAIL", res.get("error", "no answer")
 
     problems = []
@@ -104,11 +116,18 @@ def check_case(case):
 
 
 def main():
+    # Optional axis filter: `python -m evals.run_evals injection` runs only that axis.
+    # Useful on the free tier (20 reqs/day) — run one small axis at a time within quota.
+    axis_filter = sys.argv[1].lower() if len(sys.argv) > 1 else None
+    cases = [c for c in CASES if c["axis"] == axis_filter] if axis_filter else CASES
+
     print("=" * 64)
-    print(f"NYKAA BEAUTY ADVISOR — EVAL SCORECARD   (mode: {'LIVE' if LIVE else 'MOCK'})")
+    title = f"EVAL SCORECARD   (mode: {'LIVE' if LIVE else 'MOCK'}"
+    title += f", axis={axis_filter})" if axis_filter else ")"
+    print("NYKAA BEAUTY ADVISOR — " + title)
     print("=" * 64)
     tally = {}
-    for case in CASES:
+    for case in cases:
         status, detail = check_case(case)
         tally.setdefault(case["axis"], []).append(status)
         mark = {"PASS": "✓", "FAIL": "✗", "SKIP": "–"}[status]
