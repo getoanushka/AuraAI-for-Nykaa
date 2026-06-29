@@ -126,7 +126,11 @@ INTENT_GUIDANCE = {
     "recommend": "Goal: recommend the best-matching product(s). If a category is clear "
                  "(e.g. 'sunscreen', 'lipstick'), recommend solid options even when skin "
                  "type isn't given — don't ask for it just to proceed. If earlier "
-                 "conversation turns are shown, treat this as a refinement of them.",
+                 "conversation turns or a 'Current bag' are shown, treat this as a "
+                 "REFINEMENT of that selection: when the shopper says 'make it cheaper' "
+                 "(or similar), keep the SAME product categories/steps they already have "
+                 "and swap in a cheaper option for each — do NOT drop items or shrink the "
+                 "set unless they explicitly ask to remove something.",
     "routine": "Goal: build a complete routine. Include the logical steps in order "
                "(cleanser -> serum/treatment -> moisturizer -> sunscreen for daytime) "
                "and stay within budget.",
