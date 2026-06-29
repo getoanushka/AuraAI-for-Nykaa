@@ -380,6 +380,28 @@ function addToCart(id,q=1,reveal=false){
 }
 function setQty(id,q){ if(q<=0) delete cart[id]; else cart[id]=q; renderCart(); }
 function removeItem(id){ delete cart[id]; renderCart(); }
+// Swap every bagged item for the cheapest product in the SAME category — keeps the
+// same number of items/steps, just cheaper. Deterministic (no LLM call).
+function makeBagCheaper(){
+  const items = cartList();
+  const newCart = {}, changes = [];
+  items.forEach(({p,q})=>{
+    const cheapest = CATALOG.filter(x=>x.category===p.category)
+                            .sort((a,b)=>a.price_inr-b.price_inr)[0];
+    if(cheapest && cheapest.price_inr < p.price_inr){
+      newCart[cheapest.product_id] = (newCart[cheapest.product_id]||0) + q;
+      changes.push(`• ${p.name} (${fmt(p.price_inr)}) → ${cheapest.name} (${fmt(cheapest.price_inr)})`);
+    } else {
+      newCart[p.product_id] = (newCart[p.product_id]||0) + q;  // already the cheapest — keep it
+      changes.push(`• ${p.name} — already the most affordable ${p.category}`);
+    }
+  });
+  cart = newCart; lastRec = Object.keys(newCart); renderCart(); toggleCart(true);
+  agentAct("Swapped your bag for cheaper picks.");
+  agentSay("Here's a cheaper version of your bag:\n" + changes.join("\n") +
+           `\n\nNew total: ${fmt(cartTotal())}.`);
+  showChips(["proceed to checkout","clear my bag"]);
+}
 function cartList(){ return Object.entries(cart).map(([id,q])=>({p:CATALOG.find(x=>x.product_id===id),q})); }
 function cartTotal(){ return cartList().reduce((s,{p,q})=>s+p.price_inr*q,0); }
 function cartCount(){ return cartList().reduce((s,{q})=>s+q,0); }
@@ -500,6 +522,12 @@ async function handle(text){
   }
   if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; lastRec=[]; renderCart(); convo=[]; agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
   if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
+  // "make it cheaper" — deterministic swap: each bagged item → cheapest in its category.
+  // Done in code (not the model) so it reliably keeps every step and never shrinks the set.
+  if(/\b(cheaper|cheapest|less expensive)\b|(reduce|lower)\s+(the\s+)?(price|cost)/.test(q)){
+    if(!cartCount()){ agentSay("Add something to your bag first, then I'll find cheaper picks."); return; }
+    makeBagCheaper(); return;
+  }
 
   // Everything else → the real Gemini brain on the backend, with conversation context.
   const history = convoContext();
