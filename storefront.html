@@ -497,7 +497,7 @@ async function handle(text){
     if(!cartCount()){ agentSay("Your bag's empty — add something first and I'll take you to checkout."); return; }
     agentAct("Taking you to checkout…"); checkout(); return;
   }
-  if(/clear|empty|remove all/.test(q)){ cart={}; renderCart(); convo=[]; agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
+  if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; renderCart(); convo=[]; agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
   if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
 
   // Everything else → the real Gemini brain on the backend, with conversation context.
@@ -568,7 +568,7 @@ function handleOffline(text){
     agentAct("Taking you to checkout…"); checkout(); return;
   }
   // clear/empty
-  if(/clear|empty|remove all/.test(q)){ cart={}; renderCart(); agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
+  if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; renderCart(); agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
   // show bag
   if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
 
