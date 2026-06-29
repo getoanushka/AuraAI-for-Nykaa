@@ -312,6 +312,7 @@ const PROD_IMAGES = {
 
 // ---- State ----
 let cart = {}; // product_id -> qty
+let lastRec = []; // product_ids Nebula recommended last turn (so refinements swap, not stack)
 
 // ---- Render storefront ----
 const swatchColors = {
@@ -440,7 +441,7 @@ function openOnNykaa(){
 }
 function closeCheckout(){ document.getElementById('modal').classList.remove('open'); }
 // "Clear bag" — only empties when the user explicitly asks; checkout never wipes it.
-function resetOrder(){ cart={}; renderCart(); document.getElementById('modal').classList.remove('open'); toggleCart(false); }
+function resetOrder(){ cart={}; lastRec=[]; renderCart(); document.getElementById('modal').classList.remove('open'); toggleCart(false); }
 
 // ---- Floating agent ----
 function togglePanel(force){
@@ -497,7 +498,7 @@ async function handle(text){
     if(!cartCount()){ agentSay("Your bag's empty — add something first and I'll take you to checkout."); return; }
     agentAct("Taking you to checkout…"); checkout(); return;
   }
-  if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; renderCart(); convo=[]; agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
+  if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; lastRec=[]; renderCart(); convo=[]; agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
   if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
 
   // Everything else → the real Gemini brain on the backend, with conversation context.
@@ -533,8 +534,16 @@ function applyAdvice(ans, userText, budget){
     if(userText){ remember("User", userText); remember("Nebula", msg); }
     return;
   }
-  recs.forEach(r=>addToCart(r.product_id));
-  agentAct(`Added ${recs.length} product(s) to your bag.`);
+  // "add a sunscreen too" = append; anything else (e.g. "make it cheaper", a new
+  // routine) = a refinement, so swap out what Nebula last recommended instead of
+  // stacking duplicates on top. Manual "Add to Bag" picks are never touched.
+  const isAdd = /\b(add|also|too|another|one more|plus|include)\b/i.test(userText || "");
+  if(!isAdd) lastRec.forEach(id=>{ delete cart[id]; });
+  recs.forEach(r=>{ cart[r.product_id] = cart[r.product_id] || 1; });  // present once, no stacking
+  const ids = recs.map(r=>r.product_id);
+  lastRec = isAdd ? [...new Set([...lastRec, ...ids])] : ids;
+  renderCart();
+  agentAct(`${isAdd ? "Added" : "Updated your bag with"} ${recs.length} product(s).`);
   let msg = (ans.intro?ans.intro+"\n":"") +
     recs.map(r=>`• ${r.name} — ${fmt(r.price_inr)}${r.why?" — "+r.why:""}`).join("\n") +
     `\n\nTotal: ${fmt(ans.total_inr || recs.reduce((s,r)=>s+r.price_inr,0))}.`;
@@ -568,7 +577,7 @@ function handleOffline(text){
     agentAct("Taking you to checkout…"); checkout(); return;
   }
   // clear/empty
-  if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; renderCart(); agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
+  if(/(clear|empty)\s+(my\s+|the\s+)?(bag|cart)|remove all/.test(q)){ cart={}; lastRec=[]; renderCart(); agentAct("Cleared your bag."); agentSay("Fresh start. What would you like?"); return; }
   // show bag
   if(/(my )?bag|cart/.test(q) && !/add|put/.test(q)){ toggleCart(true); agentSay(`You have ${cartCount()} item(s), total ${fmt(cartTotal())}.`); return; }
 
